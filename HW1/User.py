@@ -64,7 +64,7 @@ class User:
         return fnl.removesuffix("\n")
 
     def __str__(self) -> str:
-        fnl = f"{self.count}x {self.age.getValue()}, {self.education.getValue()}, {self.marital_status.getValue()}, {self.race.getValue()}\n"
+        fnl = f"KMin: {self.k_min} {self.count}x {self.age.getValue()}, {self.education.getValue()}, {self.marital_status.getValue()}, {self.race.getValue()}\n"
         for occ in self.occupation:
             fnl += f"\t{str(occ)}\n"
         return fnl

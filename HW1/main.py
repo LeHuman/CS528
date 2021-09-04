@@ -55,14 +55,15 @@ def main():
 
         workingUsers = groupedUsers
 
-        print(f"Groups left: {len(workingUsers)}")
+        print(f"q*-blocks: {len(workingUsers)}")
 
-    print("Done")
+    print(f"Done: {len(workingUsers)}")
 
     fnl = ""
 
     for user in workingUsers:
         fnl += str(user) + "\n"
+        # fnl += user.basicStr() + "\n"
 
     with open("out.data", "w") as f:
         f.write(fnl)
