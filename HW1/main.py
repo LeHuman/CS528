@@ -1,4 +1,5 @@
 import Stats
+from random import randint as rnd
 from User import User
 
 
@@ -17,10 +18,16 @@ def main():
     with open("Data/adult.data") as f:
         userList = interpretData(f.read())
 
-    Stats.printAgeStats(userList)
-    Stats.printEducationStats(userList)
-    Stats.printMatrialStats(userList)
-    Stats.printRaceStats(userList)
+    for user in userList[:100]:
+        attrs = user.attributes()
+        attrs[rnd(0, len(attrs) - 1)].upGenLevel()
+        attrs[rnd(0, len(attrs) - 1)].upGenLevel()
+        print(user)
+
+    # Stats.printAgeStats(userList)
+    # Stats.printEducationStats(userList)
+    # Stats.printMatrialStats(userList)
+    # Stats.printRaceStats(userList)
 
 
 main()

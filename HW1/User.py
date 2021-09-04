@@ -1,14 +1,18 @@
+from Attr import Age, Education, MaritalStatus, Race
+
 UID = 0
+
 
 class User:
     UID = None
     k_min = 0
 
-    age: int
-    education: str
-    marital_status: str
+    age: Age
+    education: Education
+    marital_status: MaritalStatus
+    race: Race
+
     occupation: str
-    race: str
 
     def __init__(
         self,
@@ -29,11 +33,12 @@ class User:
         salary,
     ):
 
-        self.age = int(age.strip())
-        self.education = education.strip()
-        self.marital_status = marital_status.strip()
+        self.age = Age(age.strip())
+        self.education = Education(education.strip())
+        self.marital_status = MaritalStatus(marital_status.strip())
+        self.race = Race(race.strip())
+
         self.occupation = None if occupation.strip() == "?" else occupation.strip()
-        self.race = race.strip()
         self.k_min = 10 if "<=50K" in salary.strip() else 5
 
         global UID
@@ -41,7 +46,7 @@ class User:
         UID += 1
 
     def __str__(self) -> str:
-        return f"ID:{self.UID}\tK:{self.k_min}\n\tage: {self.age}\n\teducation: {self.education}\n\tmarital_status: {self.marital_status}\n\toccupation: {self.occupation}\n\trace: {self.race}"
+        return f"ID:{self.UID}\tK:{self.k_min}\n\toccupation: {self.occupation}\n\tage: {self.age.getValue()}\n\teducation: {self.education.getValue()}\n\tmarital_status: {self.marital_status.getValue()}\n\trace: {self.race.getValue()}"
 
-    def attributes(self):
-        return (self.age, self.education, self.marital_status, self.occupation, self.race)
+    def attributes(self) -> tuple:
+        return (self.age, self.education, self.marital_status, self.race)

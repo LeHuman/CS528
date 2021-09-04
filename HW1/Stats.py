@@ -11,7 +11,7 @@ except ImportError:
 def printAgeStats(userList: list):
     ages = list()
     for user in userList:
-        ages.append(user.age)
+        ages.append(user.age.value)
 
     print(f"Mean Age: {statistics.mean(ages)}")
     print(f"Median Age: {statistics.median(ages)}")
@@ -47,7 +47,7 @@ def printEducationStats(userList: list):
     eduBins = [0] * len(education_values)
 
     for user in userList:
-        i = education_values.index(user.education)
+        i = education_values.index(user.education.value)
         eduBins[i] += 1
 
     if pd != None:
@@ -74,7 +74,7 @@ def printMatrialStats(userList: list):
     marBins = [0] * len(matrial_values)
 
     for user in userList:
-        i = matrial_values.index(user.marital_status)
+        i = matrial_values.index(user.marital_status.value)
         marBins[i] += 1
 
     if pd != None:
@@ -99,7 +99,7 @@ def printRaceStats(userList: list):
     raceBins = [0] * len(race_values)
 
     for user in userList:
-        i = race_values.index(user.race)
+        i = race_values.index(user.race.value)
         raceBins[i] += 1
 
     if pd != None:
