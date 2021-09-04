@@ -1,23 +1,33 @@
 class Attribute:
-    gen_max = 0
     gen_level = 0
+    gen_max = 0
+    ratio = 0.0
     value = "*"
 
     def __init__(self, gen_max: int, value):
         self.gen_max = gen_max
         self.value = value
 
+    def __eq__(self, o: object) -> bool:
+        return self.getValue() == o.getValue()
+
+    def _setRatio(self):
+        self.ratio = self.gen_level / self.gen_max
+
     def setGenLevel(self, gen: int):
         self.gen_level = max(0, min(gen, self.gen_max))
+        self._setRatio()
 
     def upGenLevel(self) -> int:
         if self.gen_max > self.gen_level:
             self.gen_level += 1
+        self._setRatio()
         return self.gen_level
 
     def downGenLevel(self) -> int:
         if self.gen_level > 0:
             self.gen_level -= 1
+        self._setRatio()
         return self.gen_level
 
     def getValue(self) -> str:
@@ -154,3 +164,23 @@ class Race(Attribute):
                     return k
         else:
             return "*"
+
+
+class Occupation:
+    value: str
+    count = 1
+
+    def __init__(self, value: str):
+        self.value = value
+
+    def __eq__(self, o: object) -> bool:
+        if self.value == o.value:
+            self.count += o.count
+            return True
+        return False
+
+    def __str__(self) -> str:
+        return f"{self.count}x {self.value}"
+
+    def __hash__(self) -> int:
+        return self.value.__hash__()
