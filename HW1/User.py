@@ -5,11 +5,11 @@ class User:
     UID = None
     k_min = 0
 
-    age = None
-    education = None
-    marital_status = None
-    occupation = None
-    race = None
+    age : int
+    education : str
+    marital_status : str
+    occupation : str
+    race : str
 
     def __init__(
         self,
@@ -30,7 +30,7 @@ class User:
         salary,
     ):
 
-        self.age = age.strip()
+        self.age = int(age.strip())
         self.education = education.strip()
         self.marital_status = marital_status.strip()
         self.occupation = None if occupation.strip() is "?" else occupation.strip()
