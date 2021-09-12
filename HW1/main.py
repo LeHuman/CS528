@@ -3,8 +3,8 @@ from User import User
 global_k = global_l = global_c = None  # defaults to user preference
 
 # Force set diversity values on every user
-# global_k = 5
-# global_l = 3
+global_k = 1
+global_l = 3
 # global_c = 0.5
 
 
@@ -128,6 +128,9 @@ def getDistortion(users: list[User]) -> float:
 
 
 def main():
+
+    print(f"K:{global_k} L:{global_l} C:{global_c}\n")
+
     rawUsers: list
 
     print("Interpreting Data")
