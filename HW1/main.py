@@ -17,15 +17,11 @@ def interpretData(data: str):  # 'cast' each user into User class
     return userList
 
 
-def main():
-    rawUsers: list
-
-    with open("Data/adult.data") as f:
-        rawUsers = interpretData(f.read())
-
-    workingUsers = rawUsers.copy()
-
+def condenseUsers(workingUsers: list) -> list:
     run = True
+    last = len(workingUsers) + 1
+
+    print(f"Condensing {last-1} blocks")
 
     while run:
         run = False
@@ -34,7 +30,7 @@ def main():
 
         while len(workingList) != 0:
             u = workingList.pop()
-            if not u:
+            if not u or u.generalized():
                 continue
 
             i = 0
@@ -45,9 +41,10 @@ def main():
 
             groupedUsers.append(u)
 
-        if len(workingUsers) == len(groupedUsers):
+        if len(groupedUsers) == last:
             workingUsers = groupedUsers
             break
+        last = len(groupedUsers)
 
         for user in groupedUsers:
             if not user.satisfied():
@@ -59,12 +56,28 @@ def main():
         print(f"q*-blocks: {len(workingUsers)}")
 
     print(f"Done: {len(workingUsers)}")
+    return workingUsers
+
+
+def printUserList(raw: list, users: list):
+
+    print(f"Printing output of {len(users)} blocks")
+
+    # output raw initial data
+
+    fnl = ""
+
+    for user in raw:
+        fnl += str(user) + "\n"
+
+    with open("private_q-blocks.data", "w") as f:
+        f.write(fnl)
 
     # output q-blocks
 
     fnl = ""
 
-    for user in workingUsers:
+    for user in users:
         fnl += user.privateStr() + "\n"
 
     with open("private_q-blocks.data", "w") as f:
@@ -74,7 +87,7 @@ def main():
 
     fnl = ""
 
-    for user in workingUsers:
+    for user in users:
         fnl += str(user) + "\n"
 
     with open("out_condensed.data", "w") as f:
@@ -84,11 +97,60 @@ def main():
 
     fnl = ""
 
-    for user in workingUsers:
+    for user in users:
         fnl += user.basicStr() + "\n"
 
     with open("out.data", "w") as f:
         f.write(fnl)
+
+
+def removeUnsatisfiedUsers(users: list) -> list:
+    finalUsers = list()
+    for user in users:
+        if user.satisfied():
+            finalUsers.append(user)
+    return finalUsers
+
+
+def main():
+    rawUsers: list
+
+    # open data file and interpret each line as a user
+    with open("Data/adult.data") as f:
+        rawUsers = interpretData(f.read())
+
+    # condense users into q-blocks
+    condensedUsers = condenseUsers(rawUsers.copy())
+
+    while True:
+        # extract outliers (where a user's occupation exists only once per q-block) and condense
+        print("Condensing outliers")
+        outliers = set()
+        for user in condensedUsers:
+            outliers = outliers.union(user.extractOutliers())
+
+        # break loop is no more outliers have occurred or if unable to condense further
+        if len(outliers) == 0:
+            break
+
+        print(f"Extracted {len(outliers)} outliers")
+
+        # readd condensed outliers
+        outliers = condenseUsers(list(outliers))
+        removeUnsatisfiedUsers(outliers)
+        condensedUsers.extend(outliers)
+
+        if len(outliers) == 0:
+            break
+
+        # recondense after outliers have been re-added
+        condensedUsers = condenseUsers(condensedUsers)
+
+    print("Done with outliers")
+
+    finalUsers = removeUnsatisfiedUsers(condensedUsers)
+
+    printUserList(rawUsers, finalUsers)
 
 
 main()
