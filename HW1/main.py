@@ -70,7 +70,6 @@ def condenseUsers(workingUsers: list) -> list:
 
 
 def printUserList(raw: list, users: list):
-
     print(f"Printing output of {len(users)} blocks")
 
     # output raw initial data
@@ -78,19 +77,14 @@ def printUserList(raw: list, users: list):
     fnl = ""
 
     for user in raw:
-        fnl += str(user) + "\n"
+        fnl += user.basicStr() + "\n"
 
-    with open("private_q-blocks.data", "w") as f:
+    with open("input.data", "w") as f:
         f.write(fnl)
 
     # output q-blocks
 
     fnl = ""
-    count = 0
-
-    for user in users:
-        fnl += user.privateStr() + "\n"
-        count += user.count
 
     with open("private_q-blocks.data", "w") as f:
         f.write(fnl)
@@ -100,7 +94,7 @@ def printUserList(raw: list, users: list):
     fnl = ""
 
     for user in users:
-        fnl += str(user) + "\n"
+        fnl += user.toStr() + "\n"
 
     with open("out_condensed.data", "w") as f:
         f.write(fnl)
@@ -115,9 +109,13 @@ def printUserList(raw: list, users: list):
     with open("out.data", "w") as f:
         f.write(fnl)
 
+    size = getUserCount(users)
+
     print()
-    print(f"Final User Count {count}/{len(raw)} : {round((100*count)/len(raw), 2)}%")
-    print(f"Average Distortion: {getDistortion(users)}")
+    print(f"Final User Count {size}/{len(raw)} : {round((100*size)/len(raw), 2)}%")
+    print("\nTask 1(c)\n")
+    print(f"\tAverage Distortion: {getDistortion(users)}")
+    print(f"\tAverage Precision: {getPrecision(users)}")
 
 
 def removeUnsatisfiedUsers(users: list[User]) -> list:
@@ -134,6 +132,20 @@ def getDistortion(users: list[User]) -> float:
     for user in users:
         d += user.getDistortion()
     return round(d / len(users), 4)
+
+
+def getPrecision(users: list[User]) -> float:
+    d = 0
+    for user in users:
+        d += user.getPrecision()
+    return round(d / len(users), 4)
+
+
+def getUserCount(users: list[User]) -> int:
+    c = 0
+    for user in users:
+        c += user.count
+    return c
 
 
 def main():

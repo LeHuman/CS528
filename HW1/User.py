@@ -1,4 +1,4 @@
-from Attr import Age, Attribute, Education, MaritalStatus, Race, Occupation
+from Attr import TOTAL_ATTRIBUTES, Age, Attribute, Education, MaritalStatus, Race, Occupation
 
 UID = 0
 
@@ -89,7 +89,7 @@ class User:
         return f"\t{self.occupation}, {self.age.value}, {self.education.value}, {self.marital_status.value}, {self.race.value}\n"
 
     def privateStr(self) -> str:
-        fnl = f"{self.count}x | KMin: {self.k_min}, D:{round(self.getDistortion(),4)}\n"
+        fnl = f"{self.count}x | KMin: {self.k_min}, D:{round(self.getDistortion(),4)}, P:{round(self.getPrecision(),4)}\n"
 
         userSet = list(self.userSet)
         userSet.sort(key=lambda x: x.occupation)
@@ -98,11 +98,14 @@ class User:
             fnl += usr._privateStr()
         return fnl.removesuffix("\n")
 
-    def __str__(self) -> str:
-        fnl = f"{self.count}x | KMin: {self.k_min}, D:{round(self.getDistortion(),4)}\n  Attrs: {self.age.getValue()}, {self.education.getValue()}, {self.marital_status.getValue()}, {self.race.getValue()}\n"
+    def toStr(self) -> str:
+        fnl = f"{self.count}x | KMin: {self.k_min}, D:{round(self.getDistortion(),4)}, P:{round(self.getPrecision(),4)}\n  Attrs: {self.age.getValue()}, {self.education.getValue()}, {self.marital_status.getValue()}, {self.race.getValue()}\n"
         for occ in self.groupedOccupations:
             fnl += f"\t{str(occ)}\n"
         return fnl.removesuffix("\n")
+
+    def __str__(self) -> str:
+        return self.toStr()
 
     def attributes(self) -> tuple[Attribute]:
         return (self.age, self.education, self.marital_status, self.race)
@@ -171,12 +174,19 @@ class User:
                 return False
         return True
 
-    # Get attribute distortion for user / q-block
+    # Get attribute distortion for this user / q-block
     def getDistortion(self) -> float:
         d = 0
         for a in self.attributes():
             d += a.distortion
         return d
+
+    # Get attribute precision for this user / q-block
+    def getPrecision(self) -> float:
+        p = 0
+        for a in self.attributes():
+            p += a.precision_num
+        return 1 - (p / (self.count * TOTAL_ATTRIBUTES))
 
     def kReached(self) -> bool:
         return self.count >= self.k_min

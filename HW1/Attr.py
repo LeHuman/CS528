@@ -5,24 +5,26 @@ class Attribute:
     gen_level = 0
     gen_max = 0
     distortion: float = 0.0
+    precision_num: float = 0.0
     value = "*"
     gen_value = "*"
 
     def __init__(self, gen_max: int, value):
         self.gen_max = gen_max
         self.value = value
-        self._setDistortion()
+        self._setQualifiers()
 
     def __eq__(self, o: object) -> bool:  # IMPROVE: give each hierarchy value an id versus comparing strings
         return self.gen_value == o.gen_value
 
-    def _setDistortion(self):
+    def _setQualifiers(self):
         self.distortion = (self.gen_level / self.gen_max) / TOTAL_ATTRIBUTES
+        self.precision_num = self.gen_level / self.gen_max  # h / |DGH_Ai|
         self.gen_value = self._getValue()
 
     def setGenLevel(self, gen: int):
         self.gen_level = max(0, min(gen, self.gen_max))
-        self._setDistortion()
+        self._setQualifiers()
 
     def upGenLevel(self):
         self.setGenLevel(self.gen_level + 1)
