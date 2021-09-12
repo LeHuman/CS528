@@ -126,9 +126,10 @@ class User:
         ocCount = dict()
         purged = set()
 
-        # TODO: only extract outliers dependend on recursive cl diversity
-        if not self.c_min:
-            return purged
+        # TODO: only extract outliers depending on recursive cl diversity
+
+        # if not self.c_min:
+        #     return purged
 
         l = list(self.userSet)  # used to remove from global set while iterating
 
@@ -143,15 +144,17 @@ class User:
                 for user in l:
                     if user.occupation == k:
                         if user is self:
-                            if self.count > 1:
-                                purged.add(user)
-                                self.userSet.remove(user)
-                                u = self.userSet.pop()
-                                for user in self.userSet:
-                                    u.add(user)
-                                purged.add(u)
-                            else:
-                                purged.add(user)
+                            # if self.count > 1:
+                            #     purged.add(user)
+                            #     self.userSet.remove(user)
+                            #     u = self.userSet.pop()
+                            #     for user in self.userSet:
+                            #         u.add(user)
+                            #     purged.add(u)
+                            # else:
+                            #     purged.add(user)
+
+                            purged.union(self.userSet)
 
                             self._initSets()
                             return purged
