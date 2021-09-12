@@ -89,7 +89,7 @@ class User:
         return f"\t{self.occupation}, {self.age.value}, {self.education.value}, {self.marital_status.value}, {self.race.value}\n"
 
     def privateStr(self) -> str:
-        fnl = f"KMin: {self.k_min} {self.count}x\n"
+        fnl = f"{self.count}x | KMin: {self.k_min}, D:{round(self.getDistortion(),4)}\n"
 
         userSet = list(self.userSet)
         userSet.sort(key=lambda x: x.occupation)
@@ -99,12 +99,12 @@ class User:
         return fnl.removesuffix("\n")
 
     def __str__(self) -> str:
-        fnl = f"KMin: {self.k_min} {self.count}x {self.age.getValue()}, {self.education.getValue()}, {self.marital_status.getValue()}, {self.race.getValue()}\n"
+        fnl = f"{self.count}x | KMin: {self.k_min}, D:{round(self.getDistortion(),4)}\n  Attrs: {self.age.getValue()}, {self.education.getValue()}, {self.marital_status.getValue()}, {self.race.getValue()}\n"
         for occ in self.groupedOccupations:
             fnl += f"\t{str(occ)}\n"
-        return fnl
+        return fnl.removesuffix("\n")
 
-    def attributes(self) -> tuple:
+    def attributes(self) -> tuple[Attribute]:
         return (self.age, self.education, self.marital_status, self.race)
 
     # Reset users that are the head of a group
@@ -159,11 +159,9 @@ class User:
     def diverseAttr(self) -> Attribute:
         topRat = 21
         topAttr = None
-        attrCount = 4
         for attr in self.attributes():
-            div = attr.gen_max / attrCount + attr.ratio
-            if div <= topRat:
-                topRat = div
+            if attr.distortion <= topRat:
+                topRat = attr.distortion
                 topAttr = attr
         return topAttr
 
@@ -172,6 +170,13 @@ class User:
             if attr.gen_level != attr.gen_max:
                 return False
         return True
+
+    # Get attribute distortion for user / q-block
+    def getDistortion(self) -> float:
+        d = 0
+        for a in self.attributes():
+            d += a.distortion
+        return d
 
     def kReached(self) -> bool:
         return self.count >= self.k_min

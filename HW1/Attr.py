@@ -1,25 +1,28 @@
+TOTAL_ATTRIBUTES = 4
+
+
 class Attribute:
     gen_level = 0
     gen_max = 0
-    ratio = 0.0
+    distortion: float = 0.0
     value = "*"
     gen_value = "*"
 
     def __init__(self, gen_max: int, value):
         self.gen_max = gen_max
         self.value = value
-        self._setRatio()
+        self._setDistortion()
 
-    def __eq__(self, o: object) -> bool: # IMPROVE: give each hierarchy value an id versus comparing strings
+    def __eq__(self, o: object) -> bool:  # IMPROVE: give each hierarchy value an id versus comparing strings
         return self.gen_value == o.gen_value
 
-    def _setRatio(self):
-        self.ratio = self.gen_level / self.gen_max
+    def _setDistortion(self):
+        self.distortion = (self.gen_level / self.gen_max) / TOTAL_ATTRIBUTES
         self.gen_value = self._getValue()
 
     def setGenLevel(self, gen: int):
         self.gen_level = max(0, min(gen, self.gen_max))
-        self._setRatio()
+        self._setDistortion()
 
     def upGenLevel(self):
         self.setGenLevel(self.gen_level + 1)

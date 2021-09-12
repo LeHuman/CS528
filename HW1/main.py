@@ -106,16 +106,25 @@ def printUserList(raw: list, users: list):
     with open("out.data", "w") as f:
         f.write(fnl)
 
+    print()
     print(f"Final User Count {count}/{len(raw)} : {round((100*count)/len(raw), 2)}%")
+    print(f"Average Distortion: {getDistortion(users)}")
 
 
-def removeUnsatisfiedUsers(users: list) -> list:
+def removeUnsatisfiedUsers(users: list[User]) -> list:
     finalUsers = list()
     for user in users:
         if user.satisfied():
             finalUsers.append(user)
     print(f"Removed {len(users) - len(finalUsers)} unsatisfied users from a total of {len(users)} users")
     return finalUsers
+
+
+def getDistortion(users: list[User]) -> float:
+    d = 0
+    for user in users:
+        d += user.getDistortion()
+    return round(d / len(users), 4)
 
 
 def main():
@@ -132,8 +141,8 @@ def main():
     condensedUsers = condenseUsers(rawUsers.copy())
 
     while True:
+        print("Checking for outliers")
         # extract outliers (where a user's occupation exists only once per q-block) and condense
-        print("Condensing outliers")
         outliers = set()
         for user in condensedUsers:
             outliers = outliers.union(user.extractOutliers())
@@ -144,6 +153,7 @@ def main():
 
         print(f"Extracted {len(outliers)} outliers")
 
+        print("Condensing outliers")
         # readd condensed outliers
         outliers = condenseUsers(list(outliers))
         removeUnsatisfiedUsers(outliers)
