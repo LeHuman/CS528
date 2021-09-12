@@ -174,6 +174,8 @@ class Occupation:
         self.value = value
 
     def __eq__(self, o: object) -> bool:
+        if not isinstance(o, Occupation):
+            return self.value == o
         if self.value == o.value:
             self.count += o.count
             return True
