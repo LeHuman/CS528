@@ -1,10 +1,19 @@
+# py 3.9.6
+
+"""
+    Illinois Institute of Technology - CS528
+    Data Privacy and Security
+    Homework 1
+    9-15-21
+"""
+
 from User import User
 
 global_k = global_l = global_c = None  # defaults to user preference
 
 # Force set diversity values on every user
-global_k = 1
-global_l = 3
+# global_k = 5
+# global_l = 3
 # global_c = 0.5
 
 
