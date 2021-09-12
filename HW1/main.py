@@ -1,19 +1,20 @@
 from User import User
 
+global_k = global_l = global_c = None  # defaults to user preference
 
-def interpretData(data: str):
+# Force set diversity values on every user
+# global_k = 5
+# global_l = 3
+# global_c = 0.5
+
+
+def interpretData(data: str):  # 'cast' each user into User class
     userList = list()
-    for line in data.splitlines():
+    for line in data.splitlines():  # for each "user" aka each data line in adult.data
         args = line.split(",")
         if len(args) == 15:
-            userList.append(User(*args))
+            userList.append(User(*args, k=global_k, l=global_l, c=global_c))
     return userList
-
-
-def kReached(userList):
-    for user in userList:
-        if not user.kReached():
-            return False
 
 
 def main():
@@ -49,7 +50,7 @@ def main():
             break
 
         for user in groupedUsers:
-            if not user.kReached():
+            if not user.satisfied():
                 user.diverseAttr().upGenLevel()
                 run = True
 
@@ -59,11 +60,32 @@ def main():
 
     print(f"Done: {len(workingUsers)}")
 
+    # output q-blocks
+
+    fnl = ""
+
+    for user in workingUsers:
+        fnl += user.privateStr() + "\n"
+
+    with open("private_q-blocks.data", "w") as f:
+        f.write(fnl)
+
+    # output final data in a condensed format
+
     fnl = ""
 
     for user in workingUsers:
         fnl += str(user) + "\n"
-        # fnl += user.basicStr() + "\n"
+
+    with open("out_condensed.data", "w") as f:
+        f.write(fnl)
+
+    # output final raw data
+
+    fnl = ""
+
+    for user in workingUsers:
+        fnl += user.basicStr() + "\n"
 
     with open("out.data", "w") as f:
         f.write(fnl)
