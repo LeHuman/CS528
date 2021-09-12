@@ -3,42 +3,42 @@ class Attribute:
     gen_max = 0
     ratio = 0.0
     value = "*"
+    gen_value = "*"
 
     def __init__(self, gen_max: int, value):
         self.gen_max = gen_max
         self.value = value
+        self._setRatio()
 
-    def __eq__(self, o: object) -> bool:
-        return self.getValue() == o.getValue()
+    def __eq__(self, o: object) -> bool: # IMPROVE: give each hierarchy value an id versus comparing strings
+        return self.gen_value == o.gen_value
 
     def _setRatio(self):
         self.ratio = self.gen_level / self.gen_max
+        self.gen_value = self._getValue()
 
     def setGenLevel(self, gen: int):
         self.gen_level = max(0, min(gen, self.gen_max))
         self._setRatio()
 
-    def upGenLevel(self) -> int:
-        if self.gen_max > self.gen_level:
-            self.gen_level += 1
-        self._setRatio()
-        return self.gen_level
+    def upGenLevel(self):
+        self.setGenLevel(self.gen_level + 1)
 
-    def downGenLevel(self) -> int:
-        if self.gen_level > 0:
-            self.gen_level -= 1
-        self._setRatio()
-        return self.gen_level
+    def downGenLevel(self):
+        self.setGenLevel(self.gen_level - 1)
+
+    def _getValue(self) -> str:
+        return self.value
 
     def getValue(self) -> str:
-        return self.value
+        return self.gen_value
 
 
 class Age(Attribute):
     def __init__(self, age: str):
         super().__init__(3, int(age))
 
-    def getValue(self) -> str:
+    def _getValue(self) -> str:
         if self.gen_level == 0:
             return str(self.value)
         elif self.gen_level == 1:
@@ -93,7 +93,7 @@ class Education(Attribute):
     def __init__(self, education: str):
         super().__init__(3, education)
 
-    def getValue(self) -> str:
+    def _getValue(self) -> str:
         if self.gen_level == 0:
             return self.value
         elif self.gen_level == 1:
@@ -129,7 +129,7 @@ class MaritalStatus(Attribute):
     def __init__(self, status: str):
         super().__init__(2, status)
 
-    def getValue(self) -> str:
+    def _getValue(self) -> str:
         if self.gen_level == 0:
             return self.value
         elif self.gen_level == 1:
@@ -155,7 +155,7 @@ class Race(Attribute):
     def __init__(self, race: str):
         super().__init__(2, race)
 
-    def getValue(self) -> str:
+    def _getValue(self) -> str:
         if self.gen_level == 0:
             return self.value
         elif self.gen_level == 1:
@@ -171,15 +171,16 @@ class Occupation:
     count = 1
 
     def __init__(self, value: str):
-        self.value = value
+        self.value = "*" if value == "?" else value
 
     def __eq__(self, o: object) -> bool:
-        if not isinstance(o, Occupation):
-            return self.value == o
         if self.value == o.value:
             self.count += o.count
             return True
         return False
+
+    def __lt__(self, other: object) -> bool:
+        return self.value.__lt__(other.value)
 
     def __str__(self) -> str:
         return f"{self.count}x {self.value}"
