@@ -17,10 +17,10 @@ class User:
     race: Race
 
     # r_1, ..., r_m
-    groupedOccupations: set
+    groupedOccupations: set = None
 
     # every User grouped under this user
-    userSet: set
+    userSet: set = None
 
     def __init__(
         self,
@@ -48,15 +48,14 @@ class User:
         self.education = Education(education.strip())
         self.marital_status = MaritalStatus(marital_status.strip())
         self.race = Race(race.strip())
+        self.occupation = Occupation(occupation.strip())
 
-        self.occupation = occupation.strip()
-        # self.groupedOccupations = set() if self.occupation == "?" else set([Occupation(self.occupation)])
         self._initSets()
 
         if k:
-            self.k_min = k
+            self.k_min = k  # set k if default is set
         else:
-            self.k_min = 10 if "<=50K" in salary.strip() else 5  # set user preference
+            self.k_min = 10 if "<=50K" in salary.strip() else 5  # else, set user preference
 
         # No user preference for these values
         self.l_min = l if l else None
@@ -108,10 +107,12 @@ class User:
     def attributes(self) -> tuple:
         return (self.age, self.education, self.marital_status, self.race)
 
+    # Reset users that are the head of a group
     def _initSets(self):
-        self.groupedOccupations = set([Occupation(self.occupation)])
-        self.userSet = set([self])
-        self.count = 1
+        if not self.userSet or self.count != 1:
+            self.groupedOccupations = set([self.occupation])
+            self.userSet = set([self])
+            self.count = 1
 
     def add(self, user) -> bool:
         if self == user:
@@ -128,8 +129,8 @@ class User:
 
         # TODO: only extract outliers depending on recursive cl diversity
 
-        # if not self.c_min:
-        #     return purged
+        if not self.c_min:
+            return purged
 
         l = list(self.userSet)  # used to remove from global set while iterating
 
@@ -144,16 +145,6 @@ class User:
                 for user in l:
                     if user.occupation == k:
                         if user is self:
-                            # if self.count > 1:
-                            #     purged.add(user)
-                            #     self.userSet.remove(user)
-                            #     u = self.userSet.pop()
-                            #     for user in self.userSet:
-                            #         u.add(user)
-                            #     purged.add(u)
-                            # else:
-                            #     purged.add(user)
-
                             purged.union(self.userSet)
 
                             self._initSets()
@@ -178,7 +169,7 @@ class User:
 
     def generalized(self) -> bool:
         for attr in self.attributes():
-            if attr.gen_max != attr.gen_level:
+            if attr.gen_level != attr.gen_max:
                 return False
         return True
 
