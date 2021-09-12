@@ -42,6 +42,7 @@ def condenseUsers(workingUsers: list) -> list:
             groupedUsers.append(u)
 
         if len(groupedUsers) == last:
+            print("Unable to further generalize")
             workingUsers = groupedUsers
             break
         last = len(groupedUsers)
@@ -113,15 +114,19 @@ def removeUnsatisfiedUsers(users: list) -> list:
     for user in users:
         if user.satisfied():
             finalUsers.append(user)
+    print(f"Removed {len(users) - len(finalUsers)} unsatisfied users from a total of {len(users)} users")
     return finalUsers
 
 
 def main():
     rawUsers: list
 
+    print("Interpreting Data")
     # open data file and interpret each line as a user
     with open("Data/adult.data") as f:
         rawUsers = interpretData(f.read())
+
+    # rawUsers = rawUsers[:5000]
 
     # condense users into q-blocks
     condensedUsers = condenseUsers(rawUsers.copy())
