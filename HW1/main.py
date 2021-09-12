@@ -76,9 +76,11 @@ def printUserList(raw: list, users: list):
     # output q-blocks
 
     fnl = ""
+    count = 0
 
     for user in users:
         fnl += user.privateStr() + "\n"
+        count += user.count
 
     with open("private_q-blocks.data", "w") as f:
         f.write(fnl)
@@ -102,6 +104,8 @@ def printUserList(raw: list, users: list):
 
     with open("out.data", "w") as f:
         f.write(fnl)
+
+    print(f"Final User Count {count}/{len(raw)} : {round((100*count)/len(raw), 2)}%")
 
 
 def removeUnsatisfiedUsers(users: list) -> list:
