@@ -7,6 +7,10 @@
     9-15-21
 """
 
+import sys
+
+assert sys.version_info >= (3, 9)
+
 from Attr import TOTAL_ATTRIBUTES
 from User import User
 
@@ -15,7 +19,7 @@ global_k = global_l = global_c = None  # defaults to user preference
 # Force set diversity values on every user
 global_k = 5
 global_l = 3
-# global_c = 0.5
+global_c = 0.5
 
 
 def interpretData(data: str):  # 'cast' each user into User class
@@ -27,7 +31,7 @@ def interpretData(data: str):  # 'cast' each user into User class
     return userList
 
 
-def condenseUsers(workingUsers: list) -> list:
+def condenseUsers(workingUsers: list[User]) -> list[User]:
     run = True
     last = len(workingUsers) + 1
 
@@ -35,8 +39,8 @@ def condenseUsers(workingUsers: list) -> list:
 
     while run:
         run = False
-        workingList = workingUsers.copy()
-        groupedUsers = list()
+        workingList: list[User] = workingUsers.copy()
+        groupedUsers: list[User] = list()
 
         while len(workingList) != 0:
             u = workingList.pop()
@@ -155,25 +159,12 @@ def getUserCount(users: list[User]) -> int:
     return c
 
 
-def main():
-
-    print(f"K:{global_k} L:{global_l} C:{global_c}\n")
-
-    rawUsers: list
-
-    print("Interpreting Data")
-    # open data file and interpret each line as a user
-    with open("Data/adult.data") as f:
-        rawUsers = interpretData(f.read())
-
-    # condense users into q*-blocks
-    condensedUsers = condenseUsers(rawUsers.copy())
-
+def removeOutliers(users: list[User]) -> list[User]:
     while True:
         print("Checking for outliers")
         # extract outliers (where a user's occupation exists only once per q*-block) and condense
         outliers = set()
-        for user in condensedUsers:
+        for user in users:
             outliers = outliers.union(user.extractOutliers())
 
         # break loop is no more outliers have occurred or if unable to condense further
@@ -186,16 +177,36 @@ def main():
         # readd condensed outliers
         outliers = condenseUsers(list(outliers))
         removeUnsatisfiedUsers(outliers)
-        condensedUsers.extend(outliers)
+        users.extend(outliers)
 
         if len(outliers) == 0:
             break
 
         # recondense after outliers have been re-added
-        condensedUsers = condenseUsers(condensedUsers)
-
+        users = condenseUsers(users)
     print("Done with outliers")
+    return users
 
+
+def main():
+
+    print(f"K:{global_k} L:{global_l} C:{global_c}\n")
+
+    rawUsers: list
+
+    print("Interpreting Data")
+
+    # open data file and interpret each line as a user
+    with open("Data/adult.data") as f:
+        rawUsers = interpretData(f.read())
+
+    # condense users into q*-blocks
+    condensedUsers = condenseUsers(rawUsers.copy())
+
+    # remove outliers
+    # condensedUsers = removeOutliers(condensedUsers)
+
+    # remove users / blocks that do not meet criterial
     finalUsers = removeUnsatisfiedUsers(condensedUsers)
 
     printUserList(rawUsers, finalUsers)

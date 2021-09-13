@@ -169,26 +169,3 @@ class Race(Attribute):
                     return k
         else:
             return "*"
-
-
-class Occupation:
-    value: str
-    count = 1
-
-    def __init__(self, value: str):
-        self.value = "*" if value == "?" else value
-
-    def __eq__(self, o: object) -> bool:
-        if self.value == o.value:
-            self.count += o.count
-            return True
-        return False
-
-    def __lt__(self, other: object) -> bool:
-        return self.value.__lt__(other.value)
-
-    def __str__(self) -> str:
-        return f"{self.count}x {self.value}"
-
-    def __hash__(self) -> int:
-        return self.value.__hash__()

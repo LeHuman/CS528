@@ -1,4 +1,5 @@
-from Attr import TOTAL_ATTRIBUTES, Age, Attribute, Education, MaritalStatus, Race, Occupation
+from typing import Counter
+from Attr import TOTAL_ATTRIBUTES, Age, Attribute, Education, MaritalStatus, Race
 
 UID = 0
 
@@ -17,7 +18,7 @@ class User:
     race: Race
 
     # r_1, ..., r_m
-    groupedOccupations: set = None
+    groupedOccupations: Counter[str] = None
 
     # every User grouped under this user
     userSet: set = None
@@ -48,7 +49,7 @@ class User:
         self.education = Education(education.strip())
         self.marital_status = MaritalStatus(marital_status.strip())
         self.race = Race(race.strip())
-        self.occupation = Occupation(occupation.strip())
+        self.occupation = occupation.strip()
 
         self._initSets()
 
@@ -76,13 +77,15 @@ class User:
         )
 
     def __hash__(self) -> int:
-        return id(self)
+        return UID
 
     def basicStr(self) -> str:
         fnl = ""
-        for occ in self.groupedOccupations:
-            for _ in range(occ.count):
-                fnl += f"{occ.value}, {self.age.getValue()}, {self.education.getValue()}, {self.marital_status.getValue()}, {self.race.getValue()}\n"
+        for occ, c in self.groupedOccupations.items():
+            for _ in range(c):
+                fnl += (
+                    f"{occ}, {self.age.getValue()}, {self.education.getValue()}, {self.marital_status.getValue()}, {self.race.getValue()}\n"
+                )
         return fnl.removesuffix("\n")
 
     def _privateStr(self) -> str:
@@ -104,8 +107,8 @@ class User:
 
     def toStr(self) -> str:
         fnl = f"{self.count}x | KMin: {self.k_min}, D:{round(self.getDistortion(),4)}, P:{round(self.getPrecision(),4)}\n  Attrs: {self.age.getValue()}, {self.education.getValue()}, {self.marital_status.getValue()}, {self.race.getValue()}\n"
-        for occ in self.groupedOccupations:
-            fnl += f"\t{str(occ)}\n"
+        for occ, c in self.groupedOccupations.items():
+            fnl += f"\t{c}x {occ}\n"
         return fnl.removesuffix("\n")
 
     def __str__(self) -> str:
@@ -117,24 +120,23 @@ class User:
     # Reset users that are the head of a group
     def _initSets(self):
         if not self.userSet or self.count != 1:
-            self.groupedOccupations = set([self.occupation])
+            self.groupedOccupations = Counter({self.occupation: 1})
             self.userSet = set([self])
             self.count = 1
 
     def add(self, user) -> bool:
         if self == user:
             self.count += user.count
-            self.groupedOccupations = self.groupedOccupations.union(user.groupedOccupations)
+            self.groupedOccupations.update(user.groupedOccupations)
             self.userSet = self.userSet.union(user.userSet)
             user._initSets()  # re-init the user's sets that is being merged
             return True
         return False
 
+    # Not Used
     def extractOutliers(self) -> set:
         ocCount = dict()
         purged = set()
-
-        # TODO: only extract outliers depending on recursive cl diversity
 
         if not self.c_min:
             return purged
@@ -148,7 +150,7 @@ class User:
 
         for k, v in ocCount.items():
             if v == 1:
-                self.groupedOccupations.remove(k)
+                del self.groupedOccupations[k]  # FIXME: Breaks final count
                 for user in l:
                     if user.occupation == k:
                         if user is self:
@@ -203,9 +205,23 @@ class User:
         return self.count >= self.k_min
 
     def lReached(self) -> bool:
-        if not self.l_min:
+        if not self.l_min or self.c_min:  # Ignore entropy l diversity check if c is set
             return True
         return len(self.groupedOccupations) >= self.l_min
 
+    def cReached(self) -> bool:
+        if not self.c_min or not self.l_min:  # We need both l and c
+            return True
+
+        ocCount = dict()
+        for user in self.userSet:
+            if not ocCount.get(user.occupation):
+                ocCount[user.occupation] = 0
+            ocCount[user.occupation] += 1
+
+        vH = max(ocCount.values())
+
+        return vH < self.c_min * (self.count - vH)
+
     def satisfied(self) -> bool:
-        return self.kReached() and self.lReached()
+        return self.kReached() and self.lReached() and self.cReached()
