@@ -7,28 +7,89 @@
     9-15-21
 """
 
+import os
+from Attr import TOTAL_ATTRIBUTES
+from User import User
 import sys
 
 assert sys.version_info >= (3, 9)
 
-from Attr import TOTAL_ATTRIBUTES
-from User import User
 
-global_k = global_l = global_c = None  # defaults to user preference
+# I/O
 
-# Force set diversity values on every user
-global_k = 5
-global_l = 3
-global_c = 0.5
+output_path = "output"
 
 
-def interpretData(data: str):  # 'cast' each user into User class
+def printUserList(prefix: str, raw: list[User], users: list[User]):
+    print(f"Printing output of {len(users)} blocks")
+
+    if not os.path.isdir(output_path):
+        os.mkdir(output_path)
+
+    path = os.path.join(output_path, prefix)
+
+    if not os.path.isdir(path):
+        os.mkdir(path)
+
+    # output initial filtered data
+
+    fnl = ""
+
+    for user in raw:
+        fnl += user.privateStr(True) + "\n"
+
+    with open(os.path.join(path, f"{prefix}_input.data"), "w") as f:
+        f.write(fnl)
+
+    # output private data in final q*-blocks
+
+    fnl = ""
+
+    for user in users:
+        fnl += user.privateStr() + "\n"
+
+    with open(os.path.join(path, f"{prefix}_input_condensed.data"), "w") as f:
+        f.write(fnl)
+
+    # output final raw data
+
+    fnl = ""
+
+    for user in users:
+        fnl += user.basicStr() + "\n"
+
+    with open(os.path.join(path, f"{prefix}_out.data"), "w") as f:
+        f.write(fnl)
+
+    # output final data in a condensed format
+
+    fnl = ""
+
+    for user in users:
+        fnl += user.toStr() + "\n"
+
+    with open(os.path.join(path, f"{prefix}_out_condensed.data"), "w") as f:
+        f.write(fnl)
+
+    # print final stats
+
+    size = getUserCount(users)
+
+    print()
+    print(f"Final User Count {size}/{len(raw)} : {round((100*size)/len(raw), 2)}%")
+
+
+# 'cast' each user into User class
+def interpretData(data: str, global_k: float = None, global_l: float = None, global_c: float = None):
     userList = list()
     for line in data.splitlines():  # for each "user" aka each data line in adult.data
         args = line.split(",")
         if len(args) == 15:
             userList.append(User(*args, k=global_k, l=global_l, c=global_c))
     return userList
+
+
+# Condensers
 
 
 def condenseUsers(workingUsers: list[User]) -> list[User]:
@@ -74,60 +135,6 @@ def condenseUsers(workingUsers: list[User]) -> list[User]:
     return workingUsers
 
 
-def printUserList(raw: list[User], users: list[User]):
-    print(f"Printing output of {len(users)} blocks")
-
-    # output initial filtered data
-
-    fnl = ""
-
-    for user in raw:
-        fnl += user.privateStr(True) + "\n"
-
-    with open("input.data", "w") as f:
-        f.write(fnl)
-
-    # output private data in final q*-blocks
-
-    fnl = ""
-
-    for user in users:
-        fnl += user.privateStr() + "\n"
-
-    with open("input_condensed.data", "w") as f:
-        f.write(fnl)
-
-    # output final raw data
-
-    fnl = ""
-
-    for user in users:
-        fnl += user.basicStr() + "\n"
-
-    with open("out.data", "w") as f:
-        f.write(fnl)
-
-    # output final data in a condensed format
-
-    fnl = ""
-
-    for user in users:
-        fnl += user.toStr() + "\n"
-
-    with open("out_condensed.data", "w") as f:
-        f.write(fnl)
-
-    # print final stats
-
-    size = getUserCount(users)
-
-    print()
-    print(f"Final User Count {size}/{len(raw)} : {round((100*size)/len(raw), 2)}%")
-    print("\nTask 1(c)\n")
-    print(f"\tAverage Distortion: {getDistortion(users)}")
-    print(f"\tAverage Precision: {getPrecision(users)}")
-
-
 def removeUnsatisfiedUsers(users: list[User]) -> list:
     finalUsers = list()
     for user in users:
@@ -138,27 +145,7 @@ def removeUnsatisfiedUsers(users: list[User]) -> list:
     return finalUsers
 
 
-def getDistortion(users: list[User]) -> float:
-    d = 0
-    for user in users:
-        d += user.getDistortion()
-    return round(d / len(users), 4)
-
-
-def getPrecision(users: list[User]) -> float:
-    d = 0
-    for user in users:
-        d += user.getPrecisionNumerator()
-    return round(1 - (d / (getUserCount(users) * TOTAL_ATTRIBUTES)), 4)
-
-
-def getUserCount(users: list[User]) -> int:
-    c = 0
-    for user in users:
-        c += user.count
-    return c
-
-
+# Not Used
 def removeOutliers(users: list[User]) -> list[User]:
     while True:
         print("Checking for outliers")
@@ -188,17 +175,45 @@ def removeOutliers(users: list[User]) -> list[User]:
     return users
 
 
-def main():
+# Qualifiers
 
-    print(f"K:{global_k} L:{global_l} C:{global_c}\n")
+
+def getDistortion(users: list[User]) -> float:
+    d = 0
+    for user in users:
+        d += user.getDistortion()
+    return round(d / len(users), 4)
+
+
+def getPrecision(users: list[User]) -> float:
+    d = 0
+    for user in users:
+        d += user.getPrecisionNumerator()
+    return round(1 - (d / (getUserCount(users) * TOTAL_ATTRIBUTES)), 4)
+
+
+def getUserCount(users: list[User]) -> int:
+    c = 0
+    for user in users:
+        c += user.count
+    return c
+
+
+# Logic
+
+
+def anonymizeData(name: str, k: float = None, l: float = None, c: float = None) -> list[User]:
+    print(f"K:{k} L:{l} C:{c}\n")
 
     rawUsers: list
 
     print("Interpreting Data")
 
     # open data file and interpret each line as a user
-    with open("Data/adult.data") as f:
-        rawUsers = interpretData(f.read())
+    with open("data/adult.data") as f:
+        rawUsers = interpretData(f.read(), k, l, c)
+
+    rawUsers = rawUsers[:1000]
 
     # condense users into q*-blocks
     condensedUsers = condenseUsers(rawUsers.copy())
@@ -209,7 +224,51 @@ def main():
     # remove users / blocks that do not meet criterial
     finalUsers = removeUnsatisfiedUsers(condensedUsers)
 
-    printUserList(rawUsers, finalUsers)
+    printUserList(name, rawUsers, finalUsers)
+    return finalUsers
+
+
+def main():
+
+    print("Running Task 1")
+
+    task1Users = anonymizeData("Task1")
+
+    print("\nTask 1 (c)\n")
+    print(f"\tAverage Distortion: {getDistortion(task1Users)}")
+    print(f"\tAverage Precision: {getPrecision(task1Users)}")
+
+    print("Running Task 2 (c)")
+
+    task1Users = anonymizeData("Task2c", 5, 3)
+
+    print("\nTask 2 (c)\n")
+    print(f"\tAverage Distortion: {getDistortion(task1Users)}")
+    print(f"\tAverage Precision: {getPrecision(task1Users)}")
+
+    print("Running Task 2 (d) I")
+
+    task1Users = anonymizeData("Task2dI", 5, 3, 0.5)
+
+    print("\nTask 2 (d) I\n")
+    print(f"\tAverage Distortion: {getDistortion(task1Users)}")
+    print(f"\tAverage Precision: {getPrecision(task1Users)}")
+
+    print("Running Task 2 (d) II")
+
+    task1Users = anonymizeData("Task2dII", 5, 3, 1)
+
+    print("\nTask 2 (d) II\n")
+    print(f"\tAverage Distortion: {getDistortion(task1Users)}")
+    print(f"\tAverage Precision: {getPrecision(task1Users)}")
+
+    print("Running Task 2 (d) III")
+
+    task1Users = anonymizeData("Task2dIII", 5, 3, 2)
+
+    print("\nTask 2 (d) III\n")
+    print(f"\tAverage Distortion: {getDistortion(task1Users)}")
+    print(f"\tAverage Precision: {getPrecision(task1Users)}")
 
 
 main()
