@@ -8,9 +8,10 @@
 """
 
 import os
+import sys
+
 from Attr import TOTAL_ATTRIBUTES
 from User import User
-import sys
 
 assert sys.version_info >= (3, 9)
 
@@ -203,17 +204,15 @@ def getUserCount(users: list[User]) -> int:
 
 
 def anonymizeData(name: str, k: float = None, l: float = None, c: float = None) -> list[User]:
-    print(f"K:{k} L:{l} C:{c}\n")
+    print(f"{name} K:{k} L:{l} C:{c}\n")
 
     rawUsers: list
 
-    print("Interpreting Data")
+    print(f"{name} Interpreting Data")
 
     # open data file and interpret each line as a user
     with open("data/adult.data") as f:
         rawUsers = interpretData(f.read(), k, l, c)
-
-    rawUsers = rawUsers[:1000]
 
     # condense users into q*-blocks
     condensedUsers = condenseUsers(rawUsers.copy())
@@ -228,8 +227,10 @@ def anonymizeData(name: str, k: float = None, l: float = None, c: float = None) 
     return finalUsers
 
 
-def main():
+# Tasks
 
+
+def Task1():
     print("Running Task 1")
 
     task1Users = anonymizeData("Task1")
@@ -238,6 +239,8 @@ def main():
     print(f"\tAverage Distortion: {getDistortion(task1Users)}")
     print(f"\tAverage Precision: {getPrecision(task1Users)}")
 
+
+def Task2c():
     print("Running Task 2 (c)")
 
     task1Users = anonymizeData("Task2c", 5, 3)
@@ -246,6 +249,8 @@ def main():
     print(f"\tAverage Distortion: {getDistortion(task1Users)}")
     print(f"\tAverage Precision: {getPrecision(task1Users)}")
 
+
+def Task2dI():
     print("Running Task 2 (d) I")
 
     task1Users = anonymizeData("Task2dI", 5, 3, 0.5)
@@ -254,6 +259,8 @@ def main():
     print(f"\tAverage Distortion: {getDistortion(task1Users)}")
     print(f"\tAverage Precision: {getPrecision(task1Users)}")
 
+
+def Task2dII():
     print("Running Task 2 (d) II")
 
     task1Users = anonymizeData("Task2dII", 5, 3, 1)
@@ -262,6 +269,8 @@ def main():
     print(f"\tAverage Distortion: {getDistortion(task1Users)}")
     print(f"\tAverage Precision: {getPrecision(task1Users)}")
 
+
+def Task2dIII():
     print("Running Task 2 (d) III")
 
     task1Users = anonymizeData("Task2dIII", 5, 3, 2)
@@ -271,4 +280,15 @@ def main():
     print(f"\tAverage Precision: {getPrecision(task1Users)}")
 
 
-main()
+def main():
+    tasks = (Task1, Task2c, Task2dI, Task2dII, Task2dIII)
+
+    if len(sys.argv) > 1:
+        tasks[int(sys.argv[1]) - 1]()
+        sys.exit()
+    else:
+        sys.exit(f"Give argument for task to run \n  Eg: {sys.argv[0]} [1-{len(tasks)}]")
+
+
+if __name__ == "__main__":
+    main()
