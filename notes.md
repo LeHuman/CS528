@@ -22,5 +22,62 @@
 - cluster up queries that point to the same links
   - queries that users made are clustered if they clicked on the same link
 
+#### Test
+- Attacks
+  - Linkage
+  - Homogeneity
+  - Background knowledge
+  - Skewness
+  - Similarity
+
+- k-Anon, l-Div, t-Closeness
+
 ## Chapt 3.
 
+**Background knowledge!**
+Anon methods so far do not protect against BG very well
+
+TDC produce anon datasets, like HW1
+
+### Differential Privacy
+    Promise for protection against arbitrary background knowledge
+
+    Protection relies on the fact that it is not certain if a particular user is part of the dataset
+
+    Causes a paradox
+        learn nothing about the individual but learn about the population
+    
+    Statistical outcome should be indistinguishable if a particular user is included or not
+        Where there are spike, correlations
+
+### Probability Div Priv
+    Two *users* that differ in one record / attribute should have a very similar probability in being an output
+        an output being a specific user
+        similar *user* entries should not have distinct outputs.
+    
+    Noise is added to meet criteria? difficult to distinguish
+
+### Parameter eps
+    control the degree at which two similar entries could be distinguished between eachother
+
+    D_2 neighboor of D_1
+
+    p(D_1) / p(D_2) <= e^eps
+
+### Indistinguishably
+    for every possible neighbor
+    p(D_1) / p(D_2) <= e^eps
+
+### Adding noise
+- Laplace Mechanism - Distribution
+  - Noise determined on esp
+  - Lap(S/esp)
+  - keep mean u=0
+  - variance 2b^2
+  - Is a piecewise func
+  - works for any function returning a real number
+  - Error
+    - E(true ans - noise ans)^2
+- Global sensitivity
+  - How sensitive a func is
+- More noise is added if a function is sensitive
