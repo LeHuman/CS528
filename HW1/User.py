@@ -88,8 +88,12 @@ class User:
     def _privateStr(self) -> str:
         return f"\t{self.occupation}, {self.age.value}, {self.education.value}, {self.marital_status.value}, {self.race.value}\n"
 
-    def privateStr(self) -> str:
-        fnl = f"{self.count}x | KMin: {self.k_min}, D:{round(self.getDistortion(),4)}, P:{round(self.getPrecision(),4)}\n"
+    def privateStr(self, basic=False) -> str:
+        fnl = (
+            f"{self.count}x | KMin: {self.k_min}, D:{round(self.getDistortion(),4)}, P:{round(self.getPrecision(),4)}\n"
+            if not basic
+            else ""
+        )
 
         userSet = list(self.userSet)
         userSet.sort(key=lambda x: x.occupation)
@@ -174,19 +178,26 @@ class User:
                 return False
         return True
 
-    # Get attribute distortion for this user / q-block
+    # Get attribute distortion for this user / q*-block
     def getDistortion(self) -> float:
         d = 0
         for a in self.attributes():
             d += a.distortion
         return d
 
-    # Get attribute precision for this user / q-block
+    # Get precision numerator of these users to calc table precision
+    def getPrecisionNumerator(self) -> int:
+        p = 0
+        for a in self.attributes():
+            p += a.precision_num
+        return p * self.count
+
+    # Get attribute precision for this user / q*-block
     def getPrecision(self) -> float:
         p = 0
         for a in self.attributes():
             p += a.precision_num
-        return 1 - (p / (self.count * TOTAL_ATTRIBUTES))
+        return 1 - (p / TOTAL_ATTRIBUTES)
 
     def kReached(self) -> bool:
         return self.count >= self.k_min

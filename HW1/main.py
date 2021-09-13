@@ -7,13 +7,14 @@
     9-15-21
 """
 
+from Attr import TOTAL_ATTRIBUTES
 from User import User
 
 global_k = global_l = global_c = None  # defaults to user preference
 
 # Force set diversity values on every user
-# global_k = 5
-# global_l = 3
+global_k = 5
+global_l = 3
 # global_c = 0.5
 
 
@@ -69,24 +70,37 @@ def condenseUsers(workingUsers: list) -> list:
     return workingUsers
 
 
-def printUserList(raw: list, users: list):
+def printUserList(raw: list[User], users: list[User]):
     print(f"Printing output of {len(users)} blocks")
 
-    # output raw initial data
+    # output initial filtered data
 
     fnl = ""
 
     for user in raw:
-        fnl += user.basicStr() + "\n"
+        fnl += user.privateStr(True) + "\n"
 
     with open("input.data", "w") as f:
         f.write(fnl)
 
-    # output q-blocks
+    # output private data in final q*-blocks
 
     fnl = ""
 
-    with open("private_q-blocks.data", "w") as f:
+    for user in users:
+        fnl += user.privateStr() + "\n"
+
+    with open("input_condensed.data", "w") as f:
+        f.write(fnl)
+
+    # output final raw data
+
+    fnl = ""
+
+    for user in users:
+        fnl += user.basicStr() + "\n"
+
+    with open("out.data", "w") as f:
         f.write(fnl)
 
     # output final data in a condensed format
@@ -99,15 +113,7 @@ def printUserList(raw: list, users: list):
     with open("out_condensed.data", "w") as f:
         f.write(fnl)
 
-    # output final raw data
-
-    fnl = ""
-
-    for user in users:
-        fnl += user.basicStr() + "\n"
-
-    with open("out.data", "w") as f:
-        f.write(fnl)
+    # print final stats
 
     size = getUserCount(users)
 
@@ -123,7 +129,8 @@ def removeUnsatisfiedUsers(users: list[User]) -> list:
     for user in users:
         if user.satisfied():
             finalUsers.append(user)
-    print(f"Removed {len(users) - len(finalUsers)} unsatisfied users from a total of {len(users)} users")
+    if len(users) != len(finalUsers):
+        print(f"Removed {len(users) - len(finalUsers)} unsatisfied users from a total of {len(users)} users")
     return finalUsers
 
 
@@ -137,8 +144,8 @@ def getDistortion(users: list[User]) -> float:
 def getPrecision(users: list[User]) -> float:
     d = 0
     for user in users:
-        d += user.getPrecision()
-    return round(d / len(users), 4)
+        d += user.getPrecisionNumerator()
+    return round(1 - (d / (getUserCount(users) * TOTAL_ATTRIBUTES)), 4)
 
 
 def getUserCount(users: list[User]) -> int:
@@ -159,14 +166,12 @@ def main():
     with open("Data/adult.data") as f:
         rawUsers = interpretData(f.read())
 
-    # rawUsers = rawUsers[:5000]
-
-    # condense users into q-blocks
+    # condense users into q*-blocks
     condensedUsers = condenseUsers(rawUsers.copy())
 
     while True:
         print("Checking for outliers")
-        # extract outliers (where a user's occupation exists only once per q-block) and condense
+        # extract outliers (where a user's occupation exists only once per q*-block) and condense
         outliers = set()
         for user in condensedUsers:
             outliers = outliers.union(user.extractOutliers())
