@@ -64,6 +64,8 @@ D_2 neighboor of D_1
 
 p(D_1) / p(D_2) <= e^eps
 
+This is predefined
+
 ### Indistinguishably
 for every possible neighbor
 p(D_1) / p(D_2) <= e^eps
@@ -78,6 +80,38 @@ p(D_1) / p(D_2) <= e^eps
   - works for any function returning a real number
   - Error
     - E(true ans - noise ans)^2
+  - Queries to DB returns request + noise
+- Exponential Mechanism
+  - What is the most common, what is the most ...
+    - Noise cannot be added here, most is most even with noise
+  - With any user, whether they are in or not in the DB, the output should be close.
+  - Make queries return based off the probability of each attribute
+  - e.g.    Given a DB of nationalities, they are set based off the probability that they are most common.
+    - Probability is exponential? Accentuating those that are most common.
 - Global sensitivity
   - How sensitive a func is
-- More noise is added if a function is sensitive
+  - More noise is added if a function is sensitive
+
+### Indistiguishability
+Query to a database will return with noise
+- We don't know whether a particular use is actually in a database
+
+### Composition Theorems
+*Compose* all these building blocks together
+
+Parallel composition has better utility, each query has it's own esp to satisfy
+- Can be used with disjoint queries
+Sequential composition requires that all queries satisfy esp
+- Easier to implement, used when there is overlap
+
+postprocessing should not lead to any data leaks
+
+### Differential private k-means
+
+Clustering of users
+
+Noise is added to each step when calculating size, this allows the removal of a person not be noticeable
+
+Each iteration in the algorithm, esp/T, where T is the current iteration and esp is total privacy loss
+
+laplace k-means cannot distinguish small clusters that are close by
