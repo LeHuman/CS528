@@ -22,7 +22,7 @@
 - cluster up queries that point to the same links
   - queries that users made are clustered if they clicked on the same link
 
-#### Test
+### Whats on the Test?
 - Attacks
   - Linkage
   - Homogeneity
@@ -40,33 +40,33 @@ Anon methods so far do not protect against BG very well
 TDC produce anon datasets, like HW1
 
 ### Differential Privacy
-    Promise for protection against arbitrary background knowledge
+Promise for protection against arbitrary background knowledge
 
-    Protection relies on the fact that it is not certain if a particular user is part of the dataset
+Protection relies on the fact that it is not certain if a particular user is part of the dataset
 
-    Causes a paradox
-        learn nothing about the individual but learn about the population
-    
-    Statistical outcome should be indistinguishable if a particular user is included or not
-        Where there are spike, correlations
+Causes a paradox
+    learn nothing about the individual but learn about the population
+
+Statistical outcome should be indistinguishable if a particular user is included or not
+    Where there are spike, correlations
 
 ### Probability Div Priv
-    Two *users* that differ in one record / attribute should have a very similar probability in being an output
-        an output being a specific user
-        similar *user* entries should not have distinct outputs.
-    
-    Noise is added to meet criteria? difficult to distinguish
+Two *users* that differ in one record / attribute should have a very similar probability in being an output
+    an output being a specific user
+    similar *user* entries should not have distinct outputs.
+
+Noise is added to meet criteria? difficult to distinguish
 
 ### Parameter eps
-    control the degree at which two similar entries could be distinguished between eachother
+control the degree at which two similar entries could be distinguished between eachother
 
-    D_2 neighboor of D_1
+D_2 neighboor of D_1
 
-    p(D_1) / p(D_2) <= e^eps
+p(D_1) / p(D_2) <= e^eps
 
 ### Indistinguishably
-    for every possible neighbor
-    p(D_1) / p(D_2) <= e^eps
+for every possible neighbor
+p(D_1) / p(D_2) <= e^eps
 
 ### Adding noise
 - Laplace Mechanism - Distribution
