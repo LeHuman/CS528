@@ -103,6 +103,10 @@ class User:
     def __hash__(self) -> int:
         return UID
 
+    # See toStr
+    def __str__(self) -> str:
+        return self.toStr()
+
     # Return the most basic representation of this User / q*-block
     def basicStr(self) -> str:
         fnl = ""
@@ -138,10 +142,6 @@ class User:
         for occ, c in self.groupedOccupations.items():
             fnl += f"\t{c}x {occ}\n"
         return fnl.removesuffix("\n")
-
-    # See toStr
-    def __str__(self) -> str:
-        return self.toStr()
 
     # Return the attributes for this User
     def attributes(self) -> tuple[Attribute]:
