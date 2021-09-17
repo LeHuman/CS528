@@ -10,6 +10,7 @@
 """
 
 import os
+import gc
 import sys
 
 from Stats import printAllStats
@@ -124,7 +125,7 @@ def condenseUsers(workingUsers: list[User]) -> list[User]:
             if not u:  # if it was not set to None, go on
                 continue
             if u.generalized():  # if it is not completely generalized, go on
-                generalized += 1
+                generalized += u.count
                 continue
 
             i = 0
@@ -139,6 +140,7 @@ def condenseUsers(workingUsers: list[User]) -> list[User]:
         if len(groupedUsers) == last:
             print("Unable to further generalize")
             workingUsers = groupedUsers
+            gc.collect()
             break
         last = len(groupedUsers)
 
@@ -152,9 +154,12 @@ def condenseUsers(workingUsers: list[User]) -> list[User]:
         # replace new list
         workingUsers = groupedUsers
 
+        gc.collect()
+
         print(f"q*-blocks: {len(workingUsers)}")
 
     print(f"Done: {len(workingUsers)}")
+    print(f"Users: {getUserCount(workingUsers)}")
     print(f"Users Lost: {generalized}")
     return workingUsers
 
