@@ -101,45 +101,54 @@ def interpretData(data: str, global_k: float = None, global_l: float = None, glo
 # Match each user to a similar user, continuously generalizting their attributes until
 # each user is satisfied, or if users are no longer matching
 def condenseUsers(workingUsers: list[User]) -> list[User]:
+    # Whether to keep running
     run = True
+    # Keep track of the groups, if it does not change this means we are stagnating
     last = len(workingUsers) + 1
 
     print(f"Condensing {last-1} blocks")
 
+    # Keep track of users lost due to complete generalization
     generalized = 0
 
     while run:
         run = False
+        # copy of working list to be iterated over
         workingList: list[User] = workingUsers.copy()
+        # The new list of grouped users
         groupedUsers: list[User] = list()
 
         while len(workingList) != 0:
-            u = workingList.pop()
-            if not u:
+            u = workingList.pop()  # take out a user
+            if not u:  # if it was not set to None, go on
                 continue
-            if u.generalized():
+            if u.generalized():  # if it is not completely generalized, go on
                 generalized += 1
                 continue
 
             i = 0
-            for user in workingList:
+            for user in workingList:  # compare u with each other user, grouping them if matched
                 if u.add(user):
-                    workingList[i] = None
+                    workingList[i] = None  # because this user is now under another user, set it's reference in workingList to None
                 i += 1
 
-            groupedUsers.append(u)
+            groupedUsers.append(u)  # add user / q*-block to new list
 
+        # If size does not change, we are stagnating, stop
         if len(groupedUsers) == last:
             print("Unable to further generalize")
             workingUsers = groupedUsers
             break
         last = len(groupedUsers)
 
+        # For all users in the new list, if anyone is not satisfied,
+        # generalize an attribute then continue
         for user in groupedUsers:
             if not user.satisfied():
                 user.diverseAttr().upGenLevel()
                 run = True
 
+        # replace new list
         workingUsers = groupedUsers
 
         print(f"q*-blocks: {len(workingUsers)}")
