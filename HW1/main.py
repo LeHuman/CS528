@@ -20,11 +20,15 @@ assert sys.version_info >= (3, 9)
 
 # I/O
 
+# Where to output the results
 output_path = "output"
 
-
+# Print out the input and output data post anonymization
+# NOTE: only Task*_out.data within it's respective folder in output_path is the actual anonymized data, other outputs are only used for analyzing this implementation
 def printUserList(prefix: str, raw: list[User], users: list[User]):
     print(f"Printing output of {len(users)} blocks")
+
+    # make directories that are needed
 
     if not os.path.isdir(output_path):
         os.mkdir(output_path)
@@ -82,7 +86,7 @@ def printUserList(prefix: str, raw: list[User], users: list[User]):
     print(f"Final User Count {size}/{len(raw)} : {round((100*size)/len(raw), 2)}%")
 
 
-# 'cast' each user into User class
+# 'convert' each user into a User class
 def interpretData(data: str, global_k: float = None, global_l: float = None, global_c: float = None):
     userList = list()
     for line in data.splitlines():  # for each "user" aka each data line in adult.data
@@ -94,12 +98,15 @@ def interpretData(data: str, global_k: float = None, global_l: float = None, glo
 
 # Condensers
 
-
+# Match each user to a similar user, continuously generalizting their attributes until
+# each user is satisfied, or if users are no longer matching
 def condenseUsers(workingUsers: list[User]) -> list[User]:
     run = True
     last = len(workingUsers) + 1
 
     print(f"Condensing {last-1} blocks")
+
+    generalized = 0
 
     while run:
         run = False
@@ -108,7 +115,10 @@ def condenseUsers(workingUsers: list[User]) -> list[User]:
 
         while len(workingList) != 0:
             u = workingList.pop()
-            if not u or u.generalized():
+            if not u:
+                continue
+            if u.generalized():
+                generalized += 1
                 continue
 
             i = 0
@@ -135,9 +145,11 @@ def condenseUsers(workingUsers: list[User]) -> list[User]:
         print(f"q*-blocks: {len(workingUsers)}")
 
     print(f"Done: {len(workingUsers)}")
+    print(f"Users Lost: {generalized}")
     return workingUsers
 
 
+# Remove any users / q*-blocks that may be unsatisfied. This ensures the final critera for the Table is met
 def removeUnsatisfiedUsers(users: list[User]) -> list:
     finalUsers = list()
     for user in users:
@@ -148,39 +160,39 @@ def removeUnsatisfiedUsers(users: list[User]) -> list:
     return finalUsers
 
 
-# Not Used
-def removeOutliers(users: list[User]) -> list[User]:
-    while True:
-        print("Checking for outliers")
-        # extract outliers (where a user's occupation exists only once per q*-block) and condense
-        outliers = set()
-        for user in users:
-            outliers = outliers.union(user.extractOutliers())
+# NOTE: Not Used
+# def removeOutliers(users: list[User]) -> list[User]:
+#     while True:
+#         print("Checking for outliers")
+#         # extract outliers (where a user's occupation exists only once per q*-block) and condense
+#         outliers = set()
+#         for user in users:
+#             outliers = outliers.union(user.extractOutliers())
 
-        # break loop is no more outliers have occurred or if unable to condense further
-        if len(outliers) == 0:
-            break
+#         # break loop is no more outliers have occurred or if unable to condense further
+#         if len(outliers) == 0:
+#             break
 
-        print(f"Extracted {len(outliers)} outliers")
+#         print(f"Extracted {len(outliers)} outliers")
 
-        print("Condensing outliers")
-        # readd condensed outliers
-        outliers = condenseUsers(list(outliers))
-        removeUnsatisfiedUsers(outliers)
-        users.extend(outliers)
+#         print("Condensing outliers")
+#         # readd condensed outliers
+#         outliers = condenseUsers(list(outliers))
+#         removeUnsatisfiedUsers(outliers)
+#         users.extend(outliers)
 
-        if len(outliers) == 0:
-            break
+#         if len(outliers) == 0:
+#             break
 
-        # recondense after outliers have been re-added
-        users = condenseUsers(users)
-    print("Done with outliers")
-    return users
+#         # recondense after outliers have been re-added
+#         users = condenseUsers(users)
+#     print("Done with outliers")
+#     return users
 
 
 # Qualifiers
 
-
+# Get a table's average distortion
 def getDistortion(users: list[User]) -> float:
     d = 0
     for user in users:
@@ -188,6 +200,7 @@ def getDistortion(users: list[User]) -> float:
     return round(d / len(users), 4)
 
 
+# Get a table's average percision
 def getPrecision(users: list[User]) -> float:
     d = 0
     for user in users:
@@ -195,6 +208,7 @@ def getPrecision(users: list[User]) -> float:
     return round(1 - (d / (getUserCount(users) * TOTAL_ATTRIBUTES)), 4)
 
 
+# Get a table's total count of users
 def getUserCount(users: list[User]) -> int:
     c = 0
     for user in users:
@@ -225,6 +239,7 @@ def anonymizeData(name: str, k: float = None, l: float = None, c: float = None) 
     # remove users / blocks that do not meet criterial
     finalUsers = removeUnsatisfiedUsers(condensedUsers)
 
+    # print out results
     printUserList(name, rawUsers, finalUsers)
     return finalUsers
 
@@ -285,7 +300,7 @@ def Task2dIII():
 def main():
     tasks = (Task1, Task2c, Task2dI, Task2dII, Task2dIII)
 
-    if len(sys.argv) > 1:
+    if len(sys.argv) > 1 and 0 < int(sys.argv[1]) <= len(tasks):
         tasks[int(sys.argv[1]) - 1]()
         sys.exit()
     else:

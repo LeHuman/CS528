@@ -1,6 +1,20 @@
+# py 3.9.6
+
+"""
+    CS528 - Data Privacy and Security
+    Illinois Institute of Technology
+    Homework 1
+    9-15-21
+    
+    Attr.py
+    
+    All the attributes are converted into classes to help with the generalization and organization of each attribute
+"""
+
+# Total number of attributes, used for distortion and percision calculations
 TOTAL_ATTRIBUTES = 4
 
-
+# The class that all attributes extend
 class Attribute:
     gen_level = 0
     gen_max = 0
@@ -17,28 +31,36 @@ class Attribute:
     def __eq__(self, o: object) -> bool:  # IMPROVE: give each hierarchy value an id versus comparing strings
         return self.gen_value == o.gen_value
 
+    # Update qualifier values, qualifiers including distortion and precision numerator and the generalization level
     def _setQualifiers(self):
         self.distortion = (self.gen_level / self.gen_max) / TOTAL_ATTRIBUTES
         self.precision_num = self.gen_level / self.gen_max  # h / |DGH_Ai|
         self.gen_value = self._getValue()
 
+    # Set the specific generalization level of this attribute
     def setGenLevel(self, gen: int):
         self.gen_level = max(0, min(gen, self.gen_max))
         self._setQualifiers()
 
+    # Increase the generalization level of this attribute
     def upGenLevel(self):
         self.setGenLevel(self.gen_level + 1)
 
+    # Decrease the generalization level of this attribute
     def downGenLevel(self):
         self.setGenLevel(self.gen_level - 1)
 
+    # Generate and return the value, which is generalized to the level that is set
+    # This func should be extended, else it just returns the actual private value
     def _getValue(self) -> str:
         return self.value
 
+    # Return the current value, which is generalized to the level that is set
     def getValue(self) -> str:
         return self.gen_value
 
 
+# Age is not a categorical value, meaning it has no predefined hierarchy and is only implemented in _getValue
 class Age(Attribute):
     def __init__(self, age: str):
         super().__init__(3, int(age))
@@ -62,6 +84,7 @@ class Age(Attribute):
             return "*"
 
 
+# Categorical value which uses a predefined hierarchy to generalize values
 class Education(Attribute):
 
     values = {
@@ -98,7 +121,7 @@ class Education(Attribute):
     def __init__(self, education: str):
         super().__init__(3, education)
 
-    def _getValue(self) -> str:
+    def _getValue(self) -> str:  # IMPROVE: Categorical values could probably have _getValue generalized
         if self.gen_level == 0:
             return self.value
         elif self.gen_level == 1:
@@ -115,6 +138,7 @@ class Education(Attribute):
             return "*"
 
 
+# Categorical value which uses a predefined hierarchy to generalize values
 class MaritalStatus(Attribute):
 
     values = {
@@ -145,10 +169,13 @@ class MaritalStatus(Attribute):
             return "*"
 
 
+# Categorical value which uses a predefined hierarchy to generalize values
 class Race(Attribute):
 
     values = {
-        "white": ("White"),
+        "white": (  # NOTE: A significant portion of the data set is White ( nearly half ) which is why the generalization is between white and non-white
+            "White"
+        ),
         "nonWhite": (
             "Black",
             "Asian-Pac-Islander",

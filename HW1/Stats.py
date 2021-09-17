@@ -7,6 +7,9 @@
     9-15-21
     
     Stats.py
+    
+    Print out stats of the data set
+    This file was only used for creating the generalizations of QIs
 """
 
 import statistics

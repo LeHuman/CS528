@@ -7,6 +7,11 @@
     9-15-21
     
     User.py
+    
+    User class is used to help abstract each "user"; aka each line in the data set, into a usable object
+
+    Users can be grouped up with other users. When this happens, their occupations are also kept track of
+    separately using a Counter object.
 """
 
 from typing import Counter
@@ -14,14 +19,6 @@ from Attr import TOTAL_ATTRIBUTES, Age, Attribute, Education, MaritalStatus, Rac
 
 
 UID = 0  # Counter for UIDs
-
-
-"""
-    User class is used to help abstract each "user"; aka each line in the data set, into a usable object
-
-    Users can be grouped up with other users. When this happens, their occupations are also kept track of
-    separately using a Counter.
-"""
 
 
 class User:
@@ -45,7 +42,7 @@ class User:
     # Every User grouped under this User
     userSet: set = None
 
-    def __init__(
+    def __init__(  # Include all attributes, just to make it cleaner when splitting the data lines
         self,
         age,
         workclass,
@@ -95,7 +92,7 @@ class User:
     def __eq__(self, o: object) -> bool:
         return (
             o
-            and self.k_min == o.k_min # NOTE: Users are matched if they have then same k_min, k=5 or k=10 in our case
+            and self.k_min == o.k_min  # NOTE: Users are matched if they have then same k_min, k=5 or k=10 in our case
             and self.age == o.age
             and self.education == o.education
             and self.marital_status == o.marital_status
@@ -142,7 +139,7 @@ class User:
             fnl += f"\t{c}x {occ}\n"
         return fnl.removesuffix("\n")
 
-    # see toStr
+    # See toStr
     def __str__(self) -> str:
         return self.toStr()
 
@@ -168,37 +165,38 @@ class User:
         return False
 
     # Not Used
-    def extractOutliers(self) -> set:
-        ocCount = dict()
-        purged = set()
+    # def extractOutliers(self) -> set:
+    #     ocCount = dict()
+    #     purged = set()
 
-        if not self.c_min:
-            return purged
+    #     if not self.c_min:
+    #         return purged
 
-        l = list(self.userSet)  # used to remove from global set while iterating
+    #     l = list(self.userSet)  # used to remove from global set while iterating
 
-        for user in l:
-            if not ocCount.get(user.occupation):
-                ocCount[user.occupation] = 0
-            ocCount[user.occupation] += 1
+    #     for user in l:
+    #         if not ocCount.get(user.occupation):
+    #             ocCount[user.occupation] = 0
+    #         ocCount[user.occupation] += 1
 
-        for k, v in ocCount.items():
-            if v == 1:
-                del self.groupedOccupations[k]  # FIXME: Breaks final count
-                for user in l:
-                    if user.occupation == k:
-                        if user is self:
-                            purged.union(self.userSet)
+    #     for k, v in ocCount.items():
+    #         if v == 1:
+    #             del self.groupedOccupations[k]  # FIXME: Breaks final count
+    #             for user in l:
+    #                 if user.occupation == k:
+    #                     if user is self:
+    #                         purged.union(self.userSet)
 
-                            self._initSets()
-                            return purged
-                        else:
-                            purged.add(user)
-                            self.userSet.remove(user)
-                            self.count -= 1
+    #                         self._initSets()
+    #                         return purged
+    #                     else:
+    #                         purged.add(user)
+    #                         self.userSet.remove(user)
+    #                         self.count -= 1
 
-        return purged
+    #     return purged
 
+    # Return the attribute that has the least distortion
     def diverseAttr(self) -> Attribute:
         topRat = 21
         topAttr = None
@@ -208,6 +206,7 @@ class User:
                 topAttr = attr
         return topAttr
 
+    # Whether this user / q*-block has been completely generalized, rendering it useless
     def generalized(self) -> bool:
         for attr in self.attributes():
             if attr.gen_level != attr.gen_max:
@@ -235,16 +234,19 @@ class User:
             p += a.precision_num
         return 1 - (p / TOTAL_ATTRIBUTES)
 
+    # Whether k-anonymization critera has been satisfied
     def kReached(self) -> bool:
         return self.count >= self.k_min
 
+    # Whether l diversity critera has been satisfied
     def lReached(self) -> bool:
-        if not self.l_min or self.c_min:  # Ignore entropy l diversity check if c is set
+        if not self.l_min or self.c_min:  # Ignore entropy l diversity check when c is set, this means we are using c-l diversity
             return True
         return len(self.groupedOccupations) >= self.l_min
 
+    # Whether c-l diversity critera has been satisfied
     def cReached(self) -> bool:
-        if not self.c_min or not self.l_min:  # We need both l and c
+        if not self.c_min or not self.l_min:  # We need both l and c for c-l diversity
             return True
 
         ocCount = dict()
@@ -257,5 +259,6 @@ class User:
 
         return vH < self.c_min * (self.count - vH)
 
+    # Whether this user's k-anonymization, l-diversity, or recursive c-l diversity critera has been satisfied
     def satisfied(self) -> bool:
         return self.kReached() and self.lReached() and self.cReached()
