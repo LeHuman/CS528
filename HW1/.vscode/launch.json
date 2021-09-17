@@ -9,6 +9,9 @@
             "type": "python",
             "request": "launch",
             "program": "main.py",
+            "args": [
+                "3"
+            ],
             "console": "integratedTerminal"
         }
     ]

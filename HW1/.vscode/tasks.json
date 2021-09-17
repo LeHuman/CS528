@@ -9,7 +9,7 @@
             "command": "python",
             "args": [
                 "${workspaceFolder}\\main.py",
-                "5"
+                "3"
             ],
             "problemMatcher": [],
             "group": {
