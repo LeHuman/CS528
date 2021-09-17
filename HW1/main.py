@@ -12,6 +12,7 @@
 import os
 import sys
 
+from Stats import printAllStats
 from Attr import TOTAL_ATTRIBUTES
 from User import User
 
@@ -306,14 +307,30 @@ def Task2dIII():
     print(f"\tAverage Precision: {getPrecision(task1Users)}")
 
 
+def printStats():
+    rawUsers: list
+
+    with open("data/adult.data") as f:
+        rawUsers = interpretData(f.read())
+
+    printAllStats(rawUsers)
+
+
 def main():
     tasks = (Task1, Task2c, Task2dI, Task2dII, Task2dIII)
 
-    if len(sys.argv) > 1 and 0 < int(sys.argv[1]) <= len(tasks):
-        tasks[int(sys.argv[1]) - 1]()
-        sys.exit()
-    else:
-        sys.exit(f"Give argument for task to run \n  Eg: {sys.argv[0]} [1-{len(tasks)}]")
+    if len(sys.argv) > 1:
+        try:
+            if sys.argv[1][0] == "s":
+                printStats()
+                sys.exit()
+            elif 0 < int(sys.argv[1]) <= len(tasks):
+                tasks[int(sys.argv[1]) - 1]()
+                sys.exit()
+        except ValueError:
+            pass
+
+    sys.exit(f"Give argument for task to run \n  Eg: {sys.argv[0]} [1-{len(tasks)}]\n\nOr arg 's' to print stats")
 
 
 if __name__ == "__main__":

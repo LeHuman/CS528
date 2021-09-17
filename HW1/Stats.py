@@ -9,9 +9,11 @@
     Stats.py
     
     Print out stats of the data set
-    This file was only used for creating the generalizations of QIs
+    This file was only used for assistance when
+    creating the generalizations of QIs
 """
 
+from User import User
 import statistics
 
 pd = None
@@ -21,10 +23,10 @@ try:
 except ImportError:
     pd = None
 
-
-def printAgeStats(userList: list):
+# Print out stats about the data set Ages
+def printAgeStats(users: list[User]):
     ages = list()
-    for user in userList:
+    for user in users:
         ages.append(user.age.value)
 
     print(f"Mean Age: {statistics.mean(ages)}")
@@ -56,11 +58,11 @@ education_values = (
     "Preschool",
 )
 
-
-def printEducationStats(userList: list):
+# Print out stats about the data set Education
+def printEducationStats(users: list[User]):
     eduBins = [0] * len(education_values)
 
-    for user in userList:
+    for user in users:
         i = education_values.index(user.education.value)
         eduBins[i] += 1
 
@@ -83,11 +85,11 @@ matrial_values = [
     "Never-married",
 ]
 
-
-def printMatrialStats(userList: list):
+# Print out stats about the data set Matrial Statuses
+def printMatrialStats(users: list[User]):
     marBins = [0] * len(matrial_values)
 
-    for user in userList:
+    for user in users:
         i = matrial_values.index(user.marital_status.value)
         marBins[i] += 1
 
@@ -108,11 +110,11 @@ race_values = (
     "Other",
 )
 
-
-def printRaceStats(userList: list):
+# Print out stats about the data set Races
+def printRaceStats(users: list[User]):
     raceBins = [0] * len(race_values)
 
-    for user in userList:
+    for user in users:
         i = race_values.index(user.race.value)
         raceBins[i] += 1
 
@@ -123,3 +125,10 @@ def printRaceStats(userList: list):
         sx.figure.tight_layout()
         sx.figure.savefig("raceStats.png")
         sx.clear()
+
+
+def printAllStats(users: list[User]):
+    printAgeStats(users)
+    printEducationStats(users)
+    printMatrialStats(users)
+    printRaceStats(users)

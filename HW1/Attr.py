@@ -173,7 +173,7 @@ class MaritalStatus(Attribute):
 class Race(Attribute):
 
     values = {
-        "white": (  # NOTE: A significant portion of the data set is White ( nearly half ) which is why the generalization is between white and non-white
+        "white": (  # NOTE: A significant portion of the data set is White ( more than half ) which is why the generalization is between white and non-white
             "White"
         ),
         "nonWhite": (
