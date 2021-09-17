@@ -1,10 +1,12 @@
 # py 3.9.6
 
 """
-    Illinois Institute of Technology - CS528
-    Data Privacy and Security
+    CS528 - Data Privacy and Security
+    Illinois Institute of Technology
     Homework 1
     9-15-21
+    
+    main.py
 """
 
 import os

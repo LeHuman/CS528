@@ -1,3 +1,14 @@
+# py 3.9.6
+
+"""
+    CS528 - Data Privacy and Security
+    Illinois Institute of Technology
+    Homework 1
+    9-15-21
+    
+    Stats.py
+"""
+
 import statistics
 
 pd = None

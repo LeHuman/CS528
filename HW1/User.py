@@ -1,16 +1,37 @@
+# py 3.9.6
+
+"""
+    CS528 - Data Privacy and Security
+    Illinois Institute of Technology
+    Homework 1
+    9-15-21
+    
+    User.py
+"""
+
 from typing import Counter
 from Attr import TOTAL_ATTRIBUTES, Age, Attribute, Education, MaritalStatus, Race
 
-UID = 0
+
+UID = 0  # Counter for UIDs
+
+
+"""
+    User class is used to help abstract each "user"; aka each line in the data set, into a usable object
+
+    Users can be grouped up with other users. When this happens, their occupations are also kept track of
+    separately using a Counter.
+"""
 
 
 class User:
-    UID = None
-    k_min = 0
-    l_min = None
-    c_min = None
-    count = 1
+    UID = None  # Used for ease of hash func and general ID of each user
+    k_min = 0  # The minimum k-anonymity requested by the user
+    l_min = None  # The minimum entropy l-diversity requested by the user
+    c_min = None  # The minimum recursive c l-diversity requested by the user
+    count = 1  # The number of users grouped with this user, aka a q*-block
 
+    # Each attribute is casted into a class where generalizations must be made
     age: Age
     education: Education
     marital_status: MaritalStatus
@@ -18,9 +39,10 @@ class User:
     race: Race
 
     # r_1, ..., r_m
+    # Counter for each occupation that is grouped with this User / q*-block
     groupedOccupations: Counter[str] = None
 
-    # every User grouped under this user
+    # Every User grouped under this User
     userSet: set = None
 
     def __init__(
@@ -45,40 +67,46 @@ class User:
         c=None,
     ):
 
+        # "Cast" each string into an object
         self.age = Age(age.strip())
         self.education = Education(education.strip())
         self.marital_status = MaritalStatus(marital_status.strip())
         self.race = Race(race.strip())
         self.occupation = occupation.strip()
 
+        # initialize each set; user set and occupation set
         self._initSets()
 
         if k:
-            self.k_min = k  # set k if default is set
+            self.k_min = k  # set k if default is given
         else:
-            self.k_min = 10 if "<=50K" in salary.strip() else 5  # else, set user preference
+            self.k_min = 10 if "<=50K" in salary.strip() else 5  # else, set by user preference
 
         # No user preference for these values
         self.l_min = l if l else None
         self.c_min = c if c else None
 
+        # Set unique UserID
         global UID
         self.UID = UID
         UID += 1
 
-    def __eq__(self, o: object) -> bool:  # check equivalence only with other User types
+    # Check equivalence only with other User types, does not check isinstance
+    def __eq__(self, o: object) -> bool:
         return (
             o
-            and self.k_min == o.k_min
+            and self.k_min == o.k_min # NOTE: Users are matched if they have then same k_min, k=5 or k=10 in our case
             and self.age == o.age
             and self.education == o.education
             and self.marital_status == o.marital_status
             and self.race == o.race
         )
 
+    # Hash func for sets
     def __hash__(self) -> int:
         return UID
 
+    # Return the most basic representation of this User / q*-block
     def basicStr(self) -> str:
         fnl = ""
         for occ, c in self.groupedOccupations.items():
@@ -88,9 +116,11 @@ class User:
                 )
         return fnl.removesuffix("\n")
 
+    # Return the un-anonymized representation of this User, used internally
     def _privateStr(self) -> str:
         return f"\t{self.occupation}, {self.age.value}, {self.education.value}, {self.marital_status.value}, {self.race.value}\n"
 
+    # Return the un-anonymized representation of this User / q*-block, used for post anon comparison
     def privateStr(self, basic=False) -> str:
         fnl = (
             f"{self.count}x | KMin: {self.k_min}, D:{round(self.getDistortion(),4)}, P:{round(self.getPrecision(),4)}\n"
@@ -105,25 +135,29 @@ class User:
             fnl += usr._privateStr()
         return fnl.removesuffix("\n")
 
+    # Return a condensed representation of this q*-block
     def toStr(self) -> str:
         fnl = f"{self.count}x | KMin: {self.k_min}, D:{round(self.getDistortion(),4)}, P:{round(self.getPrecision(),4)}\n  Attrs: {self.age.getValue()}, {self.education.getValue()}, {self.marital_status.getValue()}, {self.race.getValue()}\n"
         for occ, c in self.groupedOccupations.items():
             fnl += f"\t{c}x {occ}\n"
         return fnl.removesuffix("\n")
 
+    # see toStr
     def __str__(self) -> str:
         return self.toStr()
 
+    # Return the attributes for this User
     def attributes(self) -> tuple[Attribute]:
         return (self.age, self.education, self.marital_status, self.race)
 
-    # Reset users that are the head of a group
+    # Initialize or reinitialize this User's sets if they are not empty
     def _initSets(self):
         if not self.userSet or self.count != 1:
             self.groupedOccupations = Counter({self.occupation: 1})
             self.userSet = set([self])
             self.count = 1
 
+    # Add a user to this User / q*-block if it is equivalent
     def add(self, user) -> bool:
         if self == user:
             self.count += user.count
