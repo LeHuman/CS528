@@ -18,7 +18,10 @@ import sys
 from Anon import anonymizeData, getDistortion, getPrecision, interpretData
 from Stats import printAllStats
 
+# Script must run in 3.9.x
 assert sys.version_info >= (3, 9)
+
+# Tasks
 
 
 def Task1():
@@ -71,6 +74,7 @@ def Task2dIII():
     print(f"\tAverage Precision: {getPrecision(task1Users)}")
 
 
+# print statistics about the data
 def printStats():
     rawUsers: list
 
@@ -80,6 +84,7 @@ def printStats():
     printAllStats(rawUsers)
 
 
+# main function that takes in arguments or manually set tasks
 def main(manual: list[int] = None):
     tasks = (Task1, Task2c, Task2dI, Task2dII, Task2dIII)
 
