@@ -160,7 +160,7 @@ def condenseUsers(workingUsers: list[User]) -> list[User]:
 
     print(f"Done: {len(workingUsers)}")
     print(f"Users: {getUserCount(workingUsers)}")
-    print(f"Users Lost: {generalized}")
+    print(f"Over-Generalized Users: {generalized}")
     return workingUsers
 
 
@@ -171,38 +171,9 @@ def removeUnsatisfiedUsers(users: list[User]) -> list:
         if user.satisfied():
             finalUsers.append(user)
     if len(users) != len(finalUsers):
-        print(f"Removed {len(users) - len(finalUsers)} unsatisfied users from a total of {len(users)} users")
+        u = getUserCount(users)
+        print(f"Removed {u - getUserCount(finalUsers)} unsatisfied users from a total of {u} users")
     return finalUsers
-
-
-# NOTE: Not Used
-# def removeOutliers(users: list[User]) -> list[User]:
-#     while True:
-#         print("Checking for outliers")
-#         # extract outliers (where a user's occupation exists only once per q*-block) and condense
-#         outliers = set()
-#         for user in users:
-#             outliers = outliers.union(user.extractOutliers())
-
-#         # break loop is no more outliers have occurred or if unable to condense further
-#         if len(outliers) == 0:
-#             break
-
-#         print(f"Extracted {len(outliers)} outliers")
-
-#         print("Condensing outliers")
-#         # readd condensed outliers
-#         outliers = condenseUsers(list(outliers))
-#         removeUnsatisfiedUsers(outliers)
-#         users.extend(outliers)
-
-#         if len(outliers) == 0:
-#             break
-
-#         # recondense after outliers have been re-added
-#         users = condenseUsers(users)
-#     print("Done with outliers")
-#     return users
 
 
 # Qualifiers
@@ -325,15 +296,12 @@ def main():
     tasks = (Task1, Task2c, Task2dI, Task2dII, Task2dIII)
 
     if len(sys.argv) > 1:
-        try:
-            if sys.argv[1][0] == "s":
-                printStats()
-                sys.exit()
-            elif 0 < int(sys.argv[1]) <= len(tasks):
-                tasks[int(sys.argv[1]) - 1]()
-                sys.exit()
-        except ValueError:
-            pass
+        if sys.argv[1][0] == "s":
+            printStats()
+            sys.exit()
+        elif sys.argv[1].isdigit() and 0 < int(sys.argv[1]) <= len(tasks):
+            tasks[int(sys.argv[1]) - 1]()
+            sys.exit()
 
     sys.exit(f"Give argument for task to run \n  Eg: {sys.argv[0]} [1-{len(tasks)}]\n\nOr arg 's' to print stats")
 
