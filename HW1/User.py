@@ -13,7 +13,7 @@
     Users can be grouped up with other users. When this happens, their occupations are also kept track of
     separately using a Counter object.
 """
-
+from math import log
 from typing import Counter
 from Attr import TOTAL_ATTRIBUTES, Age, Attribute, Education, MaritalStatus, Race
 
@@ -164,38 +164,6 @@ class User:
             return True
         return False
 
-    # Not Used
-    # def extractOutliers(self) -> set:
-    #     ocCount = dict()
-    #     purged = set()
-
-    #     if not self.c_min:
-    #         return purged
-
-    #     l = list(self.userSet)  # used to remove from global set while iterating
-
-    #     for user in l:
-    #         if not ocCount.get(user.occupation):
-    #             ocCount[user.occupation] = 0
-    #         ocCount[user.occupation] += 1
-
-    #     for k, v in ocCount.items():
-    #         if v == 1:
-    #             del self.groupedOccupations[k]  # FIXME: Breaks final count
-    #             for user in l:
-    #                 if user.occupation == k:
-    #                     if user is self:
-    #                         purged.union(self.userSet)
-
-    #                         self._initSets()
-    #                         return purged
-    #                     else:
-    #                         purged.add(user)
-    #                         self.userSet.remove(user)
-    #                         self.count -= 1
-
-    #     return purged
-
     # Return the attribute that has the least distortion
     def diverseAttr(self) -> Attribute:
         topRat = 21
@@ -236,29 +204,50 @@ class User:
 
     # Whether k-anonymization critera has been satisfied
     def kReached(self) -> bool:
-        return self.count >= self.k_min
+        return self.count >= self.k_min  # check if at least k_min users are in this q*-block
 
-    # Whether l diversity critera has been satisfied
+    # Part of entropy l-diversity equation, mostly for better understanding
+    def p_qSTARs(self, SACount: int) -> float:  # p(q*,s)
+        return SACount / self.count
+
+    # Whether entropy l-diversity critera has been satisfied
     def lReached(self) -> bool:
         if not self.l_min or self.c_min:  # Ignore entropy l diversity check when c is set, this means we are using c-l diversity
             return True
-        return len(self.groupedOccupations) >= self.l_min
+
+        s = 0
+
+        # Run the sum of the occupation counts
+        for _, c in self.groupedOccupations.items():
+            s += self.p_qSTARs(c) * log(self.p_qSTARs(c))  # What is s'?
+
+        # Check that there are l_min unique SAs, and the side effect of at least l distinct SAs
+        return -s >= log(self.l_min) and len(self.groupedOccupations) >= self.l_min
 
     # Whether c-l diversity critera has been satisfied
     def cReached(self) -> bool:
         if not self.c_min or not self.l_min:  # We need both l and c for c-l diversity
             return True
 
-        ocCount = dict()
-        for user in self.userSet:
-            if not ocCount.get(user.occupation):
-                ocCount[user.occupation] = 0
-            ocCount[user.occupation] += 1
+        # We only care about the number for each occupation
+        uniqueOccupationCounts = list(self.groupedOccupations.values())
 
-        vH = max(ocCount.values())
+        # There are not enough users to satisfy this l value
+        if len(uniqueOccupationCounts) < self.l_min:
+            return False
 
-        return vH < self.c_min * (self.count - vH)
+        # get the occupation with highest count
+        vH = max(uniqueOccupationCounts)
 
-    # Whether this user's k-anonymization, l-diversity, or recursive c-l diversity critera has been satisfied
+        # remove r_1
+        uniqueOccupationCounts.remove(max(uniqueOccupationCounts))
+
+        # remove l - 1 possible values of S
+        for _ in range(1, self.l_min - 1, 1):
+            uniqueOccupationCounts.remove(min(uniqueOccupationCounts))
+
+        return vH < self.c_min * (sum(uniqueOccupationCounts))  # r_1 < c * sum(r_l, ..., r_m)
+
+    # Whether this user / q*-block k-anonymization, l-diversity, or recursive c-l diversity critera has been satisfied
     def satisfied(self) -> bool:
         return self.kReached() and self.lReached() and self.cReached()
