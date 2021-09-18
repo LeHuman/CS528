@@ -16,6 +16,8 @@ Python 3.9.x
 
 ### How to run
 
+Ensure the data is in the same directory under the folder `data`
+
 Run main.py with a parameter 1-5 to run the respective task
 
 > python main.py [1-5]
@@ -45,3 +47,9 @@ A `User` / q*-block is considered satisfied if it meets all of it's criteria wit
 If a `User` / q*-block is not satisfied, it can increase the generatively of the attribute that would cause the least distortion and then attempt to match again.
 
 This process loops until every `User` / q*-block is satisfied or if users are no longer matching.
+
+### Note about submissions
+
+The instructions asked for two separate source files for each submission.
+
+The way I set this up only requires a change in argument for both submissions, meaning they are the same source files.
