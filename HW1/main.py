@@ -7,6 +7,11 @@
     9-15-21
     
     main.py
+    
+    The main hw script, it can take in an argument 1-5 to run
+    the respective hw task
+    
+    Argument s outputs stats on the data used to create the hierarchy
 """
 
 import os

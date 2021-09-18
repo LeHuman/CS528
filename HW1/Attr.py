@@ -8,7 +8,8 @@
     
     Attr.py
     
-    All the attributes are converted into classes to help with the generalization and organization of each attribute
+    All the attributes are converted into classes to help with the
+    generalization and organization of each attribute
 """
 
 # Total number of attributes, used for distortion and percision calculations
