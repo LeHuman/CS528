@@ -14,6 +14,8 @@ An exercise on data anonymization using k-anonymity, entropy l-diversity, and re
 
 Python 3.9.x
 
+Note: These scripts were made on Windows, but should all work fine elsewhere
+
 ### How to run
 
 Ensure the data is in the same directory under the folder `data`
