@@ -15,11 +15,12 @@
 """
 
 import sys
-from Anon import anonymizeData, getDistortion, getPrecision, interpretData
-from Stats import printAllStats
 
 # Script must run in 3.9.x
 assert sys.version_info >= (3, 9)
+
+from Anon import anonymizeData, getDistortion, getPrecision, interpretData
+from Stats import printAllStats
 
 # Tasks
 
