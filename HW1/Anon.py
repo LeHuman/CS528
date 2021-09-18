@@ -138,7 +138,6 @@ def condenseUsers(workingUsers: list[User]) -> list[User]:
         if len(groupedUsers) == last:
             print("Unable to further generalize")
             workingUsers = groupedUsers
-            gc.collect()
             break
         last = len(groupedUsers)
 
