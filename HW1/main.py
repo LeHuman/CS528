@@ -80,7 +80,7 @@ def printStats():
     printAllStats(rawUsers)
 
 
-def main(manual: int = None):
+def main(manual: list[int] = None):
     tasks = (Task1, Task2c, Task2dI, Task2dII, Task2dIII)
 
     if len(sys.argv) > 1:
@@ -92,7 +92,8 @@ def main(manual: int = None):
             sys.exit()
 
     if manual:
-        tasks[manual]()
+        for t in manual:
+            tasks[t]()
         sys.exit()
 
     sys.exit(f"Give argument for task to run \n  Eg: {sys.argv[0]} [1-{len(tasks)}]\n\nOr arg 's' to print stats")
