@@ -22,6 +22,10 @@ Run main.py with a parameter 1-5 to run the respective task
 
 > python main.py [1-5]
 
+If this is a submission, just run the appropriate main.py
+
+> python hw1-1-main.py
+
 ### How it works
 
 The given data set is formatted as such
