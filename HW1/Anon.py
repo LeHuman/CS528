@@ -12,7 +12,6 @@
 """
 
 import os
-import gc
 import sys
 
 from Attr import TOTAL_ATTRIBUTES
@@ -152,8 +151,6 @@ def condenseUsers(workingUsers: list[User]) -> list[User]:
 
         # replace new list
         workingUsers = groupedUsers
-
-        gc.collect()
 
         print(f"q*-blocks: {len(workingUsers)}")
 
