@@ -50,6 +50,8 @@ Causes a paradox
 Statistical outcome should be indistinguishable if a particular user is included or not
     Where there are spike, correlations
 
+Cannot determine if a user is in a dataset or not -> plausible deniability
+
 ### Probability Div Priv
 Two *users* that differ in one record / attribute should have a very similar probability in being an output
     an output being a specific user
@@ -66,6 +68,8 @@ p(D_1) / p(D_2) <= e^eps
 
 This is predefined
 
+esp is privacy budget
+
 ### Indistinguishably
 for every possible neighbor
 p(D_1) / p(D_2) <= e^eps
@@ -81,6 +85,7 @@ p(D_1) / p(D_2) <= e^eps
   - Error
     - E(true ans - noise ans)^2
   - Queries to DB returns request + noise
+  - Used for REAL numbers
 - Exponential Mechanism
   - What is the most common, what is the most ...
     - Noise cannot be added here, most is most even with noise
@@ -88,6 +93,7 @@ p(D_1) / p(D_2) <= e^eps
   - Make queries return based off the probability of each attribute
   - e.g.    Given a DB of nationalities, they are set based off the probability that they are most common.
     - Probability is exponential? Accentuating those that are most common.
+  - More for categorical data, how often a cat. occurs
 - Global sensitivity
   - How sensitive a func is
   - More noise is added if a function is sensitive
@@ -104,7 +110,8 @@ Parallel composition has better utility, each query has it's own esp to satisfy
 Sequential composition requires that all queries satisfy esp
 - Easier to implement, used when there is overlap
 
-postprocessing should not lead to any data leaks
+Postprocessing should not lead to any data leaks
+- not considered a composition method, does not consume privacy budget
 
 ### Differential private k-means
 
@@ -115,3 +122,38 @@ Noise is added to each step when calculating size, this allows the removal of a 
 Each iteration in the algorithm, esp/T, where T is the current iteration and esp is total privacy loss
 
 laplace k-means cannot distinguish small clusters that are close by
+
+### Relaxed DP - Non interactive
+
+The database is pre-modified? ensures DP holds true on the modified database.
+no pair of similar people can be differentiated from another.
+
+## Chapt 4 Local Differential Privacy
+
+DP on a local scale; Centralized DP
+
+Reduce trust from the database, produce private data locally
+- pre-randomize data? Don't trust the DB
+- Each user runs a local DP algorithm
+  - Once sent to the DB, it can just be combined
+
+injected noise averages out, however, it is not ideal
+
+### Combinig user data
+
+true answer + sum of N laplace distributions
+
+Example: binary user info 0/1
+Error looks like `sqrt(N)/eps` => Larger datasets lose less utility, as N gets higher
+
+Error typically scales `sqrt(N)`, the more the better
+
+### DP vs LDP
+
+LDP works on inputs no datasets
+- Ensures that no two similar inputs can be differentiated between
+  - e.g. If we get yes or no from a person, we don't know if they specifically said y/n
+
+LDP concerns two values, DP concerns two Data sets
+
+Noise in DP is constant while LDP's aggregate noise is `1/sqrt(n)`
