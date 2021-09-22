@@ -157,3 +157,36 @@ LDP works on inputs no datasets
 LDP concerns two values, DP concerns two Data sets
 
 Noise in DP is constant while LDP's aggregate noise is `1/sqrt(n)`
+
+### Google's RAPPOR
+- Random Response (RR) for something like favorite URL?
+
+#### Bloom filters can be used for indexing items
+- Items are represented as masks of this filter
+  - 01001 => Apple
+  - Filter 1001101001 has Apple
+- Using Bloom filters, each user maps their inputs to at most k bits in the filter
+  - With guarantee of 2keps
+- Using K bits to encode inputs.
+- This data structure is probabilistic, it is not 100% accurate
+
+### Apple Sketches
+- Used for capturing frequencies
+  - We don't care about who exactly, just identify groups
+
+### Microsoft Telemetry
+- Collect app usage
+  - Find behavior patterns
+
+#### 1BitMean
+#### dBitFlip
+
+### Snap LDP ML
+- Send user a randomly chosen model depending on a rand model
+
+### Frequency estimation
+- eps-LDP items should be equally probably to be output
+- We then remove bias from a RR using estimation
+
+### Generalized RR
+- Random *coin flip* is biased with param `p`
