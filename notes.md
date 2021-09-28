@@ -188,5 +188,26 @@ Noise in DP is constant while LDP's aggregate noise is `1/sqrt(n)`
 - eps-LDP items should be equally probably to be output
 - We then remove bias from a RR using estimation
 
-### Generalized RR
+### Generalized RR - Direct encoding
 - Random *coin flip* is biased with param `p`
+- Other values are reported with probability `q`
+- values `p` and `q` are inversely proportional to `d`
+  - Very large domains make the probabilities very small
+  - solved through unary encodings
+
+### Unary Encoding
+- each user randomizes the true output for each value
+- observed value is then *filtered* to get a more accurate result
+- accuracy increases with more users
+- Better than DE
+
+### Laplacian (gaussian)
+- Instead of randomizing each bit, add noise to each bit
+- Worse utility than UE
+
+### Heavy Hitter prob
+- Find one most frequent values
+  - Partition users into groups
+  - concatenate most common segments
+  - too large concatenates
+- 
