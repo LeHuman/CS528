@@ -210,4 +210,42 @@ Noise in DP is constant while LDP's aggregate noise is `1/sqrt(n)`
   - Partition users into groups
   - concatenate most common segments
   - too large concatenates
-- 
+
+### Node LDP
+- Social graphs are more diffictuly to deal with
+- isolated node groups should not be individually identifiable
+
+## Chapt 5 Cryptography
+- Data Obfuscation
+  - k-anon
+  - l-div
+  - DP - lap, exp
+  - LDP - UE, GRR, RAPPOR
+- Encrypt data - Applied Crypto
+  - Decrypt data
+
+Crypto techniques for privacy & security
+
+Crypto: Encryption (protect message) and Authentication (protect users id)
+
+### Types of basic crypto techs
+
+**Fundamental rule: Cipher should still be secure even if everyone knows the complete design**
+
+- Cipher
+  - Encrypt
+    - Shift data
+    - a->d, b->e
+    - "hello" -> "khoor"
+  - Decrypt
+    - Anyone with the cipher can break it
+- Caligula - Extended Cipher
+  - Encrypt
+    - Have sender and receiver agree on what shift to use
+    - `key` = shift decided on, is kept private
+  - Decrypt
+    - Single char is very secure
+    - For plain english, shift until there are english words
+    - given a known word and it's cipher, we can easily find the key
+    - statistical attack
+      - exploit regularities in english
