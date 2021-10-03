@@ -16,7 +16,7 @@ import numpy as np
 
 # Main Function
 def main():
-    print("\nDP - Differentially Private Classification")
+    print("\nDifferentially Private Classification")
 
     flowers = pd.read_csv("dataset/iris.data")
     print(flowers)
