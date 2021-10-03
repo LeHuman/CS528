@@ -8,7 +8,7 @@
     
     main.py
     
-    Implementation of differential privacy using the laplace mechanism
+    Example implementation of differential privacy using the laplace mechanism
 """
 
 import pandas as pd
@@ -25,6 +25,11 @@ def dpLapDataAvg(eps: float, users: pd.DataFrame):
     """
 
     users = users[users["age"] > 25]  # Only include those above 25
+
+    # avg = users["age"].mean()
+    # users = users.drop(users["age"].idxmax())
+    # avg2 = users["age"].mean()
+    # globalSense = abs(avg - avg2)
 
     # The sensitivity of a function f is the amount f's output changes when its input changes by 1
     sensitivity = 1 / eps  # Ch.3 Slide 26 gives example of 1/n, unsure if (1/n)/eps should be used instead
