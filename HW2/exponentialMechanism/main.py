@@ -75,7 +75,7 @@ def dpExpDataAvg(eps: float, users: pd.DataFrame):
 
 # Main Function
 def main():
-    print("\nDP - Laplace Mechanism")
+    print("\nDP - Exponential Mechanism")
 
     # Make prob output look nicer
     pd.options.display.float_format = "{:20,.10f}".format
