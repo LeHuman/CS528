@@ -27,7 +27,7 @@ def dpLapDataAvg(eps: float, users: pd.DataFrame):
     users = users[users["age"] > 25]  # Only include those above 25
 
     # The sensitivity of a function f is the amount f's output changes when its input changes by 1
-    sensitivity = 1 / eps
+    sensitivity = 1 / eps  # Ch.3 Slide 26 gives example of 1/n, unsure if (1/n)/eps should be used instead
     avg = users["age"].mean()
     lap = np.random.laplace(0, sensitivity, 1)[0]
     var = 2 * (sensitivity) ** 2  # Ch.3 Slide 25
