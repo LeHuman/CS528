@@ -21,7 +21,7 @@ def dpLapDataAvg(eps: float, users: pd.DataFrame):
 
     Args:
         eps (float): privacy parameter epsilon
-        ages (list[int]): list of ages
+        users (pd.DataFrame): dataframe of all users
     """
 
     users = users[users["age"] > 25]  # Only include those above 25
