@@ -11,6 +11,7 @@
     Implementation of differential privacy using the laplace mechanism
 """
 
+import pandas as pd
 import numpy as np
 
 
@@ -36,17 +37,19 @@ def getAges(datafile: str) -> list[int]:
     return fnl
 
 
-def dpLapDataAvg(eps: float, ages: list[int]):
+def dpLapDataAvg(eps: float, users: pd.DataFrame):
     """
-    Run laplace DP on age list
+    Run laplace DP on avg age query
 
     Args:
         eps (float): privacy parameter epsilon
         ages (list[int]): list of ages
     """
 
+    users = users[users["age"] > 25]  # Only include those above 25
+
     sensitivity = 1 / eps
-    avg = np.average(ages)
+    avg = users["age"].mean()
     lap = np.random.laplace(0, sensitivity, 1)[0]
     var = 2 * (sensitivity) ** 2  # Ch.3 Slide 25
 
@@ -62,10 +65,10 @@ def dpLapDataAvg(eps: float, ages: list[int]):
 def main():
     print("\nDP - Laplace Mechanism")
 
-    ages = getAges("dataset/adult.data")
+    # users = pd.read_csv("dataset/adult.data")
 
-    dpLapDataAvg(1, ages)
-    dpLapDataAvg(0.5, ages)
+    # dpLapDataAvg(1, users)
+    # dpLapDataAvg(0.5, users)
 
 
 if __name__ == "__main__":
