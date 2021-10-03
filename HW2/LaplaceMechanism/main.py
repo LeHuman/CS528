@@ -49,7 +49,7 @@ def dpLapDataAvg(eps: float, users: pd.DataFrame):
 def main():
     print("\nDP - Laplace Mechanism")
 
-    users = pd.read_csv("dataset/adult.data")
+    users = pd.read_csv("dataset/adult.data", skipinitialspace=True)
 
     dpLapDataAvg(1, users)
     dpLapDataAvg(0.5, users)
