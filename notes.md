@@ -249,3 +249,89 @@ Crypto: Encryption (protect message) and Authentication (protect users id)
     - given a known word and it's cipher, we can easily find the key
     - statistical attack
       - exploit regularities in english
+
+### Cryptographic attacks
+
+Attacker ...
+- Has only ciphertext
+- has plain and cipher text
+  - Can find decoding pattern
+
+**Kerckhoff's principle**
+Security of an encryption system **Must depend only on the key** not the algorithm itself
+
+Provable security
+no such thing as a *provably* secure system
+
+systems are only believed secure
+
+### One-Time pad
+
+Attacks that requires someone to use the same key twice
+
+Breaking One-Time Pad
+> `buy` ^ `xqr` = `zmq` --> `zmq` ^ `-xqr` = `buy`
+> `zmq` = random without key
+
+### Indistinguishablity - *like DP for messages*
+Encryptor flips rand bit `r` to encrypt `M_i` to get `C`
+
+attacker gets `C` and has to guess `r`
+
+### Practical Issues
+- One Time pad can get huge; large messages make large keys
+- It cannot be reused
+
+How to make the keys smaller?
+- 40 bits is pathetic
+- 128 is difficult 
+- 4096 mucho bueno
+
+### Crypto Algorithms
+
+#### Block Ciphers
+- given msg and key we get cipher
+- Invertibility - everything has to be reversible
+  - Given a cipher and key get msg
+- Not useful if the key to reverse is public
+  - Sol: do it multiple times?
+- Feistel network
+  - xor with key multiple times
+- Still not secure
+  - Patterns can still be observed from encrypted values
+
+Rand component - probabilistic encryption
+- and randomness to the encryption
+  - decrypted msg can still be obtained
+- How to add?
+  - one time pad trick?
+
+#### Hashes & MAC
+crypto hash func -> for data sec. and priv.
+> msg `m` -> Hash `h` -> k-bit hash `h(m)`
+
+hash func `H` - maps n bits to k bits where k is security param
+- `H` should look like a random function
+- Should be hard to find collisions
+
+Collision intractibility
+- Should be very difficult to find collisions
+
+#### Public key crypto and Diffie-hellman key exchange
+
+Public key Crypto
+- private key only known by individual
+- public key known to anyone
+
+Idea
+- Confidentiality
+  - encipher with public decipher with private
+- Auth
+  - encipher with priv key, decipher with pub
+
+Requirements
+- Easy to de/cipher
+- infeasible to get priv from pub
+- infeasible to get priv from chosen plaintext attack
+
+Messages are one-way
