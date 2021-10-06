@@ -335,3 +335,104 @@ Requirements
 - infeasible to get priv from chosen plaintext attack
 
 Messages are one-way
+
+Known to all : prime `p`, int `g` =/= 0,1, p-1
+
+e.g.
+    Alice choses priv `kA`, computes pub `kA` = `g^kA % p`
+    com with Bob, alice computes `kS = kB^kA % p`
+    com with alice, bob computes `kS = kA^kB % p`
+
+#### RSA
+Exponentiation cipher 
+Relies on the difficulty of determining the number of 
+numbers relatively prime to a large integer n 
+> `tot(n)` : number of ints less than n with no factors common with n
+
+e.g.
+
+`tot(10) => |{1,3,7,9}| => 4`
+
+`tot(21) => |{1,2,4,5,8,10,11,13,16,17,19,20}| => 12`
+
+**Algo**
+Two large primes `p`,`q`
+
+`n = pq`
+
+`tot(n)=(p-1)(q-1)`
+
+`e => e < n; e relatively prime to tot(n)`
+
+`d => ed % tot(n) = 1`
+
+pub key: `(e,n)`
+
+priv key: `(d,n)`
+
+### Security Services
+- Confidentiality
+- Authentication
+- Integrity
+- Non-Repudiation
+
+## Mid-Term
+Chapt. 1 - 5 
+Focus on 2 - 4 
+6 Questions - Sub Questions
+- Open Note - in person
+  - NOT open internet
+  - Slides work
+  - Note sheets / cheatsheets
+  - Handouts
+  - Only printouts
+- 2:00 - 2:30
+  - 30 min should be enough tho
+- Some questions might be similar to the homework
+
+### Chapt. 1
+- Understand how privacy concerns can happen
+  - Why users can be de-anonymized
+- The trade off between utility v.s. privacy
+### Chapt. 2
+- Everything regarding the HW
+- No source code, just short answer
+- QIDs
+- How data leakage can happen
+- k-anon, l-div, c-l-div
+  - Writing pseudo code
+  - How to design it
+  - Measuring distortion etc.
+- Won't ask about an exact algo but describe how to minimize utility loss
+- Vulnerabilities to methods
+- Skip pgs 57-62
+- understand how t-closeness works, not how to implement
+- how to generalize k-anon to other applications
+### Chapt. 3
+- When to use DP vs LDP
+- How DP works
+  - Why care about neighbors
+  - why care about similar outputs
+  - how it guarantees privacy
+  - When should use DP
+- Laplace / exponentiation mechanism
+  - skip proofs, only need to know how to inject noise
+- Sequential and parallel composition
+  - How does that work?
+- k-means
+- give example of when to use eps-delta
+### Chapt. 4
+- Why do we use LDP? Vs DP?
+- understand Industrial applications
+- understand bloom filter
+- GRR
+- Understand Itemset mining
+  - questions how to design
+- How to link fundamentals to higher applications
+### Chapt. 5
+- Questions should be easy?
+- Understand what is secure and not secure
+- Understand how ciphers works
+- Block cipher
+  - high level understanding
+- Understanding examples might be enough
