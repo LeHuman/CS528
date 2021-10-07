@@ -81,9 +81,9 @@ def LDP_RR(eps: float, users: DataFrame) -> None:
     returned = agesR.mean()
     unbiased = unbiasedEstimate(agesResponse)
 
-    print(f"Actual:  {actual}")
-    print(f"Return:  {returned}\t{round(100*(returned-actual)/actual,2)}%")
-    print(f"Unbiased:{unbiased}\t{round(100*(unbiased-actual)/actual,2)}%")
+    print(f"Actual:  {round(actual, 4)}")
+    print(f"Return:  {round(returned, 4)}  {round(100*(returned-actual)/actual,4)}%")
+    print(f"Unbiased:{round(unbiased, 4)}  {round(100*(unbiased-actual)/actual,4)}%")
 
 
 class UnaryEncoding(list):
@@ -195,8 +195,8 @@ def LDP_UE(eps: float, users: DataFrame) -> None:
     agesEncodedUnBiased: UnaryEncoding = agesEncodedReturn.apply(unbias)
 
     print(f"Actual:  {agesEncodedActual}")
-    print(f"Return:  {agesEncodedReturn} {agesEncodedActual.compare(agesEncodedReturn)}%")
-    print(f"Unbiased:{agesEncodedUnBiased} {agesEncodedActual.compare(agesEncodedUnBiased)}%")
+    print(f"Return:  {agesEncodedReturn}  {agesEncodedActual.compare(agesEncodedReturn)}%")
+    print(f"Unbiased:{agesEncodedUnBiased}  {agesEncodedActual.compare(agesEncodedUnBiased)}%")
 
 
 # Main Function
@@ -204,10 +204,13 @@ def main():
     print("\nLocal differential privacy")
 
     # Make prob output look nicer
-    pd.options.display.float_format = "{:20,.9f}".format
+    pd.options.display.float_format = "{:10,.6f}".format
 
     users = pd.read_csv("dataset/adult.data", skipinitialspace=True)
-    LDP_UE(1, users)
+
+    for i in range(10):
+        LDP_RR(i + 1, users)
+        LDP_UE(i + 1, users)
 
 
 if __name__ == "__main__":
