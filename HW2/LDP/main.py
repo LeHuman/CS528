@@ -56,7 +56,7 @@ def LDP_RR(eps: float, users: DataFrame) -> tuple:
         global rtnMsg
         rtnMsg += msg + "\n"
 
-    print(f"\n> Random Response | epsilon = {eps}")
+    print(f"\n> Random Response | epsilon = {eps} | n = {len(users)}")
 
     ages = users["age"]
 
@@ -177,7 +177,7 @@ def LDP_UE(eps: float, users: DataFrame) -> tuple:
         global rtnMsg
         rtnMsg += msg + "\n"
 
-    print(f"\n> Unary Encoding | epsilon = {eps}")
+    print(f"\n> Unary Encoding | epsilon = {eps} | n = {len(users)}")
 
     e = exp(eps / 2)
     p = e / (e + 1)  # Ch.4 Slide 43
@@ -263,7 +263,7 @@ def main():
     RREst_E = [round(abs(e - actual), VAL_ROUND) for e in RREst]
     x = list(range(1, EPSILON_RANGE + 1))
 
-    plt.style.use("dark_background")
+    # plt.style.use("dark_background")
     fig, ax = plt.subplots()
     UE_patch = mpatches.Patch(color="red", label="Unary Encoding")
     RR_patch = mpatches.Patch(color="blue", label="Random Response")
@@ -299,7 +299,7 @@ def main():
     x = list(range(n10, nMax, n10))
 
     plt.figure()
-    plt.style.use("dark_background")
+    # plt.style.use("dark_background")
     fig, ax = plt.subplots()
     UE_patch = mpatches.Patch(color="red", label="Unary Encoding")
     RR_patch = mpatches.Patch(color="blue", label="Random Response")
