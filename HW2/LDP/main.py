@@ -138,13 +138,6 @@ class UnaryEncoding(list):
             i += 1
         return cpy
 
-    def compare(self, y: list[int]) -> float:
-        assert len(self) == len(y)  # Cannot compare UEs with differing sizes
-        diff: UnaryEncoding = self - y
-        for i in range(len(diff)):
-            diff[i] = diff[i] / self[i]
-        return round(100 * sum(diff) / len(self), 2)
-
     def __pad(self, x: list[int], l: int) -> list[int]:
         r = (l * [0]) + x
         return r[len(r) - l :]
