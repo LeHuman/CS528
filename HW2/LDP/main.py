@@ -102,7 +102,7 @@ def LDP_RR(eps: float, users: DataFrame) -> tuple:
     print(f"Return:  {round(returned, VAL_ROUND)}")
     print(f"Unbiased:{round(unbiased, VAL_ROUND)}")
 
-    return (rtnMsg, eps, unbiased)
+    return (rtnMsg, eps, len(users), unbiased)
 
 
 class UnaryEncoding(list):
@@ -238,7 +238,7 @@ def LDP_UE(eps: float, users: DataFrame) -> tuple:
     print(f"Return:  {round(returned, VAL_ROUND)}")
     print(f"Unbiased:{round(unbiased, VAL_ROUND)}")
 
-    return (rtnMsg, eps, unbiased)
+    return (rtnMsg, eps, len(users), unbiased)
 
 
 # Main Function
@@ -261,10 +261,10 @@ def main():
     with Pool(EPSILON_RANGE) as p:
         for msg in p.starmap(LDP_UE, [(i, users) for i in range(1, EPSILON_RANGE + 1)]):
             print(msg[0])
-            UEEst[msg[1] - 1] = msg[2]
+            UEEst[msg[1] - 1] = msg[3]
         for msg in p.starmap(LDP_RR, [(i, users) for i in range(1, EPSILON_RANGE + 1)]):
             print(msg[0])
-            RREst[msg[1] - 1] = msg[2]
+            RREst[msg[1] - 1] = msg[3]
 
     UEEst_E = [round(abs(e - actual), VAL_ROUND) for e in UEEst]
     RREst_E = [round(abs(e - actual), VAL_ROUND) for e in RREst]
@@ -274,6 +274,7 @@ def main():
     fig, ax = plt.subplots()
     UE_patch = mpatches.Patch(color="red", label="Unary Encoding")
     RR_patch = mpatches.Patch(color="blue", label="Random Response")
+    plt.legend(handles=[UE_patch, RR_patch])
     ax.set_xlabel("Epsilon")
     ax.set_ylabel("L_1 - distance (Age)")
     ax.set_title("LDP Error Frequency (Avg Age)")
@@ -295,10 +296,10 @@ def main():
     with Pool(nDiffC) as p:
         for msg in p.starmap(LDP_UE, [(eps, users[:i]) for i in range(n10, nMax, n10)]):
             print(msg[0])
-            UEEst[msg[1] - 1] = msg[2]
+            UEEst[int(msg[2] / n10) - 1] = msg[3]
         for msg in p.starmap(LDP_RR, [(eps, users[:i]) for i in range(n10, nMax, n10)]):
             print(msg[0])
-            RREst[msg[1] - 1] = msg[2]
+            RREst[int(msg[2] / n10) - 1] = msg[3]
 
     UEEst_E = [round(abs(e - actual), VAL_ROUND) for e in UEEst]
     RREst_E = [round(abs(e - actual), VAL_ROUND) for e in RREst]
