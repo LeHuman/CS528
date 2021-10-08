@@ -5,16 +5,17 @@
     Illinois Institute of Technology
     Homework 2
     9-17-21
-    
+
     main.py
-    
-    Example implementation of differential privacy using the exponential mechanism
+
+    Implementation of differential privacy using the exponential mechanism
 """
+
+from math import exp
+from pandas.core.series import Series
 
 import pandas as pd
 import numpy as np
-from math import exp
-from pandas.core.series import Series
 
 
 def normalize(series: Series) -> Series:
@@ -33,7 +34,7 @@ def normalize(series: Series) -> Series:
     return series
 
 
-def dpExpDataAvg(eps: float, users: pd.DataFrame):
+def dp_exp_data_avg(eps: float, users: pd.DataFrame):
     """
     Run exponential DP on most frequent "Education" query
 
@@ -75,15 +76,15 @@ def dpExpDataAvg(eps: float, users: pd.DataFrame):
 
 # Main Function
 def main():
-    print("\nDP - Exponential Mechanism")
+    print("\nDP - Exponential Mechanism - Task 2")
 
     # Make prob output look nicer
     pd.options.display.float_format = "{:20,.10f}".format
 
     users = pd.read_csv("dataset/adult.data", skipinitialspace=True)
 
-    dpExpDataAvg(1, users)
-    dpExpDataAvg(0.5, users)
+    dp_exp_data_avg(1, users)
+    dp_exp_data_avg(0.5, users)
 
 
 if __name__ == "__main__":

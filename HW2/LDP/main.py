@@ -5,18 +5,17 @@
     Illinois Institute of Technology
     Homework 2
     9-17-21
-    
+
     main.py
-    
+
     Local differential privacy
 """
 
+from math import exp
 from functools import reduce
 from types import FunctionType
-from typing import Iterable, Iterator
 from multiprocessing import Pool
 from pandas import DataFrame, Series
-from math import exp
 
 import matplotlib.patches as mpatches
 import matplotlib.pyplot as plt
@@ -246,7 +245,7 @@ def main():
 
     actual = users["age"].mean()
 
-    print("----[ Task 4(b) ]----")
+    print("----[ Task 4(a,b) ]----")
 
     UEEst = [0] * EPSILON_RANGE
     RREst = [0] * EPSILON_RANGE
@@ -275,7 +274,7 @@ def main():
     plt.plot(x, RREst_E, "bo-")
     fig.savefig("LDP/error_plot_eps.png")
 
-    print("----[ Task 4(c) ]----")
+    print("----[ Task 4(a,c) ]----")
 
     nDiffC = int(USER_PERCENT_RANGE / 10)
     eps = 2
