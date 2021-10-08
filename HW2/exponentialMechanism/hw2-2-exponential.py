@@ -6,7 +6,7 @@
     Homework 2
     9-17-21
 
-    main.py
+    hw2-2-exponential.py
 
     Implementation of differential privacy using the exponential mechanism
 """

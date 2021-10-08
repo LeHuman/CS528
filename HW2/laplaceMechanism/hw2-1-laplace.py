@@ -6,7 +6,7 @@
     Homework 2
     9-17-21
 
-    main.py
+    hw2-1-laplace.py
 
     Implementation of differential privacy using the laplace mechanism
 """

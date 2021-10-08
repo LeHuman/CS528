@@ -6,7 +6,7 @@
     Homework 2
     9-17-21
 
-    main.py
+    hw2-3-classifier.py
 
     Differentially Private Classification using iris dataset
 """
