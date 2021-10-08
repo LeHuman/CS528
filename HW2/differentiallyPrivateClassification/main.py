@@ -18,90 +18,171 @@ from pandas.core.frame import DataFrame
 from pandas.core.series import Series
 
 
-def input_entry(sepal_length, sepal_width, petal_length, petal_width) -> Series:
-    d = {
-        "sepal-length": sepal_length,
-        "sepal-width": sepal_width,
-        "petal-length": petal_length,
-        "petal-width": petal_width,
-    }
-    return Series(data=d)
-
-
-def filter_dataset(classData: DataFrame, _=None) -> DataFrame:
-    classData = classData.drop("class", axis=1)
-    return DataFrame(data={"mean": classData.mean(), "std": classData.std()})
-
-
-def noise_LAP_AVG(eps, n):
-    sensitivity = (1 / n) / eps
-    return np.random.laplace(0, sensitivity, 1)[0]
-
-
-def dp_data_LAP(classData: DataFrame, eps: float) -> DataFrame:
-    df = filter_dataset(classData)
-    df = df.applymap(lambda x: x + noise_LAP_AVG(eps, len(classData)))
-    return df
-
-
 class Flower:
+    """Class representation of a flower type"""
+
     df: DataFrame = None
     cls = ""
     n = 0
 
-    def __init__(self, cls: str, n: int, classStats: DataFrame) -> None:
+    def __init__(self, cls: str, n: int, dataset: DataFrame) -> None:
         self.cls = cls
         self.n = n
-        self.df = classStats
+        self.df = dataset.drop("class", axis=1)
 
     def __str__(self) -> str:
         return self.df.to_string()
 
-    def gaussian_prob(self, entry: Series) -> float:
+    @staticmethod
+    def noise_lap_avg(eps: float, n: int) -> float:
+        """Generate laplacian noise fit for an average query
+
+        Args:
+            eps (float): Privacy parameter Epsilon
+            n (int): Dataset size
+
+        Returns:
+            float: noise value
+        """
+        sensitivity = (1 / n) / eps
+        return np.random.laplace(0, sensitivity, 1)[0]
+
+    def dp_data_lap(self, eps: float) -> DataFrame:
+        data = {
+            "mean": self.df.mean() + self.noise_lap_avg(eps, len(self.df)),
+            "std": self.df.std() + self.noise_lap_avg(eps, len(self.df)),
+        }
+        return DataFrame(data=data)
+
+    def gaussian_prob(self, entry: Series, eps: float) -> float:
+        """Get the Gaussian probability that an entry matches this class
+
+        Args:
+            entry (Series): The 1D Series of flower attributes
+
+        Returns:
+            float: Gaussian probability
+        """
+
+        df = self.dp_data_lap(eps)
+
         p = 1.0
-        for i, stat in self.df.iterrows():
+        for i, stat in df.iterrows():
             p *= norm.pdf(entry[i], stat["mean"], stat["std"])
         return p
 
 
-def class_prob(entry: Series, flowers: list[Flower]) -> dict[str, float]:
-    n = int(sum([f.n for f in flowers]))
-    probabilities = dict()
-    for flower in flowers:
-        probabilities[flower.cls] = flower.gaussian_prob(entry) * flower.n / n
-    return probabilities
+class Predictor:
+    """Class used for predicting flower types while respecting a privacy budget"""
 
+    flowers: list[Flower] = None
+    eps = 0.0
+    _eps = eps
 
-def predict_class(dimensions: Series, flowers: list[Flower]) -> str:
-    prob = class_prob(dimensions, flowers)
-    return max(prob.items(), key=lambda x: x[1])[0]
+    def __init__(self, flowers: list[Flower], eps: float = 0.0) -> None:
+        self.flowers = flowers
+        self.reset_budget(eps)
+
+    def reset_budget(self, eps: float = None):
+        """Resets the privacy budget
+
+        Args:
+            eps (float, optional): Privacy parameter Epsilon. Defaults to last value.
+        """
+        self._eps = eps or self._eps
+        self.eps = self._eps
+
+    def predict_class(self, entry: Series, eps: float = None) -> str:
+        """Predict which class a 1D Series of flower attributes belongs to
+
+        Args:
+            entry (Series): The 1D Series of flower attributes
+
+        Returns:
+            str: The class name
+        """
+
+        assert self.eps != 0
+        eps = self.eps if not eps else min(eps, self.eps)
+        self.eps -= eps
+
+        n = int(sum([f.n for f in self.flowers]))
+
+        probabilities = dict()
+
+        for flower in self.flowers:
+            probabilities[flower.cls] = flower.gaussian_prob(entry, eps) * flower.n / n
+
+        return max(probabilities.items(), key=lambda x: x[1])[0]
 
 
 # Main Function
 def main():
     print("\nDifferentially Private Classification\n")
 
-    flowers = pd.read_csv("dataset/iris.data")
-
-    setosas = flowers[flowers["class"] == "Iris-setosa"]
-    versicolours = flowers[flowers["class"] == "Iris-versicolor"]
-    virginicas = flowers[flowers["class"] == "Iris-virginica"]
+    flowers_raw = pd.read_csv("dataset/iris.data")
 
     tests = (
-        (flowers[1:11].drop("class", axis=1), flowers["class"][1]),
-        (flowers[51:61].drop("class", axis=1), flowers["class"][51]),
-        (flowers[101:111].drop("class", axis=1), flowers["class"][101]),
+        (flowers_raw[1:11].drop("class", axis=1), flowers_raw["class"][1]),
+        (flowers_raw[51:61].drop("class", axis=1), flowers_raw["class"][51]),
+        (flowers_raw[101:111].drop("class", axis=1), flowers_raw["class"][101]),
     )
 
-    flowers = [setosas, versicolours, virginicas]
+    flowers = [
+        flowers_raw[flowers_raw["class"] == "Iris-setosa"],
+        flowers_raw[flowers_raw["class"] == "Iris-versicolor"],
+        flowers_raw[flowers_raw["class"] == "Iris-virginica"],
+    ]
 
-    flowers = [Flower(cls["class"].values[0], len(cls), dp_data_LAP(cls, 1)) for cls in flowers]
+    flowers = [Flower(cls["class"].values[0], len(cls), cls) for cls in flowers]
 
-    for sets, actual in tests:
-        i = 0
-        for row in sets.iterrows():
-            i += 1 if predict_class(row[1], flowers) == actual else 0
-        print(f"{actual} percision = {round(100 * i / len(sets), 2)}%")
+    predictor = Predictor(flowers)
+
+    print("----[ Task 3(a-c) ]----\n")
+
+    predictor.reset_budget(1)
+
+    sample = flowers_raw.sample()
+    actual = sample["class"].values[0]
+    estimate = predictor.predict_class(sample)
+
+    print(f"Actual: {actual}")
+    print(f"Estimate: {estimate}")
+
+    result = actual == estimate
+
+    print("\n--[Remove entry from dataset]--\n")
+
+    flowers_temp = flowers_raw.drop(flowers_raw.sample().index)
+    flowers_temp = [
+        flowers_raw[flowers_raw["class"] == "Iris-setosa"],
+        flowers_raw[flowers_raw["class"] == "Iris-versicolor"],
+        flowers_raw[flowers_raw["class"] == "Iris-virginica"],
+    ]
+    flowers_temp = [Flower(cls["class"].values[0], len(cls), cls) for cls in flowers_temp]
+    flowers_temp = Predictor(flowers_temp, 1)
+
+    estimate = flowers_temp.predict_class(sample)
+
+    print(f"Actual: {actual}")
+    print(f"Estimate: {estimate}")
+
+    print(f"\nDo results match after removing user? {result == (actual == estimate)}")
+
+    print("\n----[ Task 3(d) ]----")
+
+    epsilons = (0.5, 1, 2, 4, 8, 16)
+
+    for eps in epsilons:
+        predictor.reset_budget(eps)
+        queries = sum([len(s) for s, a in tests])
+        print(f"\nepsilon : {eps} @ {queries} queries")
+        eps /= queries
+        for sets, actual in tests:
+            i = 0
+            for row in sets.iterrows():
+                i += 1 if predictor.predict_class(row[1], eps) == actual else 0
+            print(f"\t{actual} percision = {round(100 * i / len(sets), 2)}%")
 
 
 if __name__ == "__main__":
