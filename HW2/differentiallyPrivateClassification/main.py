@@ -5,9 +5,9 @@
     Illinois Institute of Technology
     Homework 2
     9-17-21
-    
+
     main.py
-    
+
     Differentially Private Classification using iris dataset
 """
 
@@ -18,23 +18,29 @@ from pandas.core.frame import DataFrame
 from pandas.core.series import Series
 
 
-def input2S(sepal_length, sepal_width, petal_length, petal_width) -> Series:
-    return Series(data={"sepal-length": sepal_length, "sepal-width": sepal_width, "petal-length": petal_length, "petal-width": petal_width})
+def input_entry(sepal_length, sepal_width, petal_length, petal_width) -> Series:
+    d = {
+        "sepal-length": sepal_length,
+        "sepal-width": sepal_width,
+        "petal-length": petal_length,
+        "petal-width": petal_width,
+    }
+    return Series(data=d)
 
 
-def filterDataset(classData: DataFrame, _=None) -> DataFrame:
+def filter_dataset(classData: DataFrame, _=None) -> DataFrame:
     classData = classData.drop("class", axis=1)
     return DataFrame(data={"mean": classData.mean(), "std": classData.std()})
 
 
-def lapNoiseAVG(eps, n):
+def noise_LAP_AVG(eps, n):
     sensitivity = (1 / n) / eps
     return np.random.laplace(0, sensitivity, 1)[0]
 
 
-def dpLAPData(classData: DataFrame, eps: float) -> DataFrame:
-    df = filterDataset(classData)
-    df = df.applymap(lambda x: x + lapNoiseAVG(eps, len(classData)))
+def dp_data_LAP(classData: DataFrame, eps: float) -> DataFrame:
+    df = filter_dataset(classData)
+    df = df.applymap(lambda x: x + noise_LAP_AVG(eps, len(classData)))
     return df
 
 
@@ -51,23 +57,23 @@ class Flower:
     def __str__(self) -> str:
         return self.df.to_string()
 
-    def gaussianProb(self, entry: Series) -> float:
+    def gaussian_prob(self, entry: Series) -> float:
         p = 1.0
         for i, stat in self.df.iterrows():
             p *= norm.pdf(entry[i], stat["mean"], stat["std"])
         return p
 
 
-def classProb(entry: Series, flowers: list[Flower]) -> dict[str, float]:
+def class_prob(entry: Series, flowers: list[Flower]) -> dict[str, float]:
     n = int(sum([f.n for f in flowers]))
     probabilities = dict()
     for flower in flowers:
-        probabilities[flower.cls] = flower.gaussianProb(entry) * flower.n / n
+        probabilities[flower.cls] = flower.gaussian_prob(entry) * flower.n / n
     return probabilities
 
 
-def predictClass(dimensions: Series, flowers: list[Flower]) -> str:
-    prob = classProb(dimensions, flowers)
+def predict_class(dimensions: Series, flowers: list[Flower]) -> str:
+    prob = class_prob(dimensions, flowers)
     return max(prob.items(), key=lambda x: x[1])[0]
 
 
@@ -89,14 +95,12 @@ def main():
 
     flowers = [setosas, versicolours, virginicas]
 
-    for i in range(len(flowers)):
-        cls = flowers[i]
-        flowers[i] = Flower(cls["class"].values[0], len(cls), dpLAPData(cls, 1))
+    flowers = [Flower(cls["class"].values[0], len(cls), dp_data_LAP(cls, 1)) for cls in flowers]
 
     for sets, actual in tests:
         i = 0
-        for set in sets.iterrows():
-            i += 1 if predictClass(set[1], flowers) == actual else 0
+        for row in sets.iterrows():
+            i += 1 if predict_class(row[1], flowers) == actual else 0
         print(f"{actual} percision = {round(100 * i / len(sets), 2)}%")
 
 
