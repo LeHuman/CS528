@@ -69,7 +69,7 @@ $Precision\ P= 1-\frac{
 
 #### Attacks with BG knowledge or non-diverse SAs
 
-| #   | Zip   | Age    | Nationality | Condition           |
+|  #  |  Zip  |  Age   | Nationality |      Condition      |
 | --- | ----- | ------ | :---------: | ------------------- |
 | 1   | 130** | < 30   |      *      | Heart Disease       |
 | 2   | 130** | < 30   |      *      | Heart Disease       |
@@ -86,13 +86,13 @@ $Precision\ P= 1-\frac{
 
 BG: Japanese have low incidence of heart disease
 
-| Name  | Zip   | Age | Nationality |
+| Name  |  Zip  | Age | Nationality |
 | ----- | ----- | --- | :---------: |
 | Umeko | 13068 | 21  |  Japanese   |
 
 **Umeko has Viral Infection!**
 
-| Name | Zip   | Age | Nationality |
+| Name |  Zip  | Age | Nationality |
 | ---- | ----- | --- | :---------: |
 | Bob  | 13053 | 31  |  American   |
 
@@ -236,6 +236,8 @@ Noise is added to meet criteria? difficult to distinguish
 
 control the degree at which two similar entries could be distinguished between eachother
 
+We care about every output because any output can possibly identify someone.
+
 D_2 neighboor of D_1
 
 p(D_1) / p(D_2) <= e^eps
@@ -248,6 +250,8 @@ esp is privacy budget
 
 for every possible neighbor
 p(D_1) / p(D_2) <= e^eps
+
+It is difficult to tell whether a user is in or not
 
 ### Adding noise
 
@@ -269,6 +273,7 @@ p(D_1) / p(D_2) <= e^eps
   - Make queries return based off the probability of each attribute
   - e.g.    Given a DB of nationalities, they are set based off the probability that they are most common.
     - Probability is exponential? Accentuating those that are most common.
+      - Creates high utility
   - More for categorical data, how often a cat. occurs
 - Global sensitivity
   - How sensitive a func is
@@ -341,6 +346,10 @@ LDP concerns two values, DP concerns two Data sets
 
 Noise in DP is constant while LDP's aggregate noise is `1/sqrt(n)`
 
+### Random Response
+
+Toss a coin (p = 0.5), send true answer if heads, otherwise, lie
+
 ### Google's RAPPOR
 
 - Random Response (RR) for something like favorite URL?
@@ -367,7 +376,11 @@ Noise in DP is constant while LDP's aggregate noise is `1/sqrt(n)`
 
 #### 1BitMean
 
+For collecting numeric data
+
 #### dBitFlip
+
+For collecting sparse histogram data
 
 ### Snap LDP ML
 
@@ -386,8 +399,9 @@ Noise in DP is constant while LDP's aggregate noise is `1/sqrt(n)`
   - Very large domains make the probabilities very small
   - solved through unary encodings
 
-### Unary Encoding
+### Unary Encoding - Basic RAPPOR
 
+- value is encoded into a bit string
 - each user randomizes the true output for each value
 - observed value is then *filtered* to get a more accurate result
 - accuracy increases with more users
@@ -447,11 +461,10 @@ Crypto: Encryption (protect message) and Authentication (protect users id)
 
 ### Cryptographic attacks
 
-Attacker ...
-
-- Has only ciphertext
-- has plain and cipher text
-  - Can find decoding pattern
+- Attacker ...
+  - Has only ciphertext
+  - has plain and cipher text
+    - Can find decoding pattern
 
 **Kerckhoff's principle**
 Security of an encryption system **Must depend only on the key** not the algorithm itself
