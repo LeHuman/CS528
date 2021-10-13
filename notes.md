@@ -1,28 +1,198 @@
-## Chapt 2.
+---
+geometry:
+-               margin=10mm
+-               letterpaper
+urlcolor:       blue
+fontsize:       11pt
+...
+
+# CS 528 Class Notes
+
+## Chapt 2
+
+### Data privacy
+
+- Logical security of data
+- It is needed
+  - Attributes of of user in a database can be used to identify them
+
+### Data Linkage
+
+- Types of attributes
+  - Identifiers (ID), attributes that explicitly identify the user
+  - Quasi-Identifier (QID), attributes that *implicitly* identify the user through comparing the attributes in public databases that have exposed IDs.
+  - Sensitive Attribute (SA), attributes that we don't want attackers to know about a user
+
+- Removing IDs is not enoughs as QIDs can be used to match the user to databases that do have their ID and then it can be use to match SAs to IDs.
+  - 87% of US citizens can be uniquely linked using only (Zip-code, DOB, Sex)
+
+### K-anonymity
+
+- Definition
+  - Each record is indistinguishable from at least k-1 other records\
+    - In terms of the QIDs, SAs are unchanged
+  - k-Anonymity ensures that linking cannot be performed with confidence
+- Implementation
+  - Randomization, Data swapping, suppression, or generalization of QIDs
+    - Generalization Hierarchies - generalization and suppression
+      - Achieve k-anonymity by successively generalizing user QIDs until each group has k-1 anonymity
+
+#### Distortion
+
+**k-minimal Distortion**: A k-minimal generalization that has the least distortion
+
+$Distortion\ D=\frac{\sum_{Attrib\ i}\frac{Current\ level\ of\ generalization\ for\ attribute\ i}{Max\ level\ of\ generalization\ for\ attribute\ i}}{Number\ of\ attributes}$
+
+#### Precision
+
+Average height of generalized values, normalized by Value 
+Generalization Hierarchy (VGH) depth per attribute per record
+
+$Precision\ P= 1-\frac{
+    \sum_{Every\ q*-block}\sum_{Number\ of\ Attributes}\frac{Gen\ level}{Max\ Gen\ level}
+}{Data\ Set\ Size\ *\ Number\ of\ Attributes}$
+
+### Attacks
+
+- Unsorted Matching Attack
+  - This attack is based on the order in which tuples appear in the released table
+  - Sol. Randomly sort the tuples before releasing
+- Complementary Release Attack
+  - Different releases can be linked together to compromise k-anonymity.
+  - Solutions
+    - Consider all of the released tables before releasing the new one, and try to avoid linking.
+    - Other data holders may release some data that can be used in this kind of attack.
+    - Generally, this kind of attack is hard to be prohibited completely.
+- Temporal Attack
+  - Adding or removing tuples may compromise k-anonymity protection
+  - Sol. Subsequent releases must use the already released table.
+
+#### Attacks with BG knowledge or non-diverse SAs
+
+| #   | Zip   | Age    | Nationality | Condition           |
+| --- | ----- | ------ | :---------: | ------------------- |
+| 1   | 130** | < 30   |      *      | Heart Disease       |
+| 2   | 130** | < 30   |      *      | Heart Disease       |
+| 3   | 130** | < 30   |      *      | **Viral Infection** |
+| 4   | 130** | < 30   |      *      | **Viral Infection** |
+| 5   | 1485* | > = 40 |      *      | Cancer              |
+| 6   | 1485* | > = 40 |      *      | Heart Disease       |
+| 7   | 1485* | > = 40 |      *      | Viral Infection     |
+| 8   | 1485* | > = 40 |      *      | Viral Infection     |
+| 9   | 130** | 3*     |      *      | **Cancer**          |
+| 10  | 130** | 3*     |      *      | **Cancer**          |
+| 11  | 130** | 3*     |      *      | **Cancer**          |
+| 12  | 130** | 3*     |      *      | **Cancer**          |
+
+BG: Japanese have low incidence of heart disease
+
+| Name  | Zip   | Age | Nationality |
+| ----- | ----- | --- | :---------: |
+| Umeko | 13068 | 21  |  Japanese   |
+
+**Umeko has Viral Infection!**
+
+| Name | Zip   | Age | Nationality |
+| ---- | ----- | --- | :---------: |
+| Bob  | 13053 | 31  |  American   |
+
+**Bob has Cancer!**
+
+### L-diversity
+
+Each equivalence class has at least l well-represented sensitive values
+
+- Distinct l-diversity
+  - Each equivalence class has at least l distinct sensitive values
+  - Probabilistic inference
+
+**Homogeneity Attacks**: k-Anonymity can create groups that leak information due to lack of diversity in the sensitive attribute.
+
+**Background Knowledge Attacks**: k-Anonymity does not protect against attacks based on background knowledge.
+
+- l-diversity principle
+  - q*-block: equivalence class
+  - A q\*-block is l-diverse if contains at least l *well-represented* values for the sensitive attribute S.
+  - A table is l-diverse if every q*-block is l-diverse.
+
+#### Entropy L-Diversity
+
+Entropy of the entire table must be l-diverse
+
+#### Recursive (C, L)-Diversity
+
+Less restrictive than entropy l-diversity
+
+For every q*-block, if the count of each attribute was sorted, q*-block is recursive (c, 2)-diverse if $r_1 < c(r_l+ r_{l+1} + ... + r_m)$ for a specified constant c.
+
+#### Limitations
+
+l-diversity may be difficult and unnecessary to achieve
+
+l-diversity does not consider the overall distribution of sensitive values
+
+- A single sensitive attribute
+  - Two values: HIV positive (1%) and HIV negative (99%)
+  - Very different degrees of sensitivity
+- l-diversity is unnecessary to achieve
+  - 2-diversity is unnecessary for an equivalence class that contains only negative records
+- l-diversity is difficult to achieve
+  - Dataset must be large enough
+
+**Similarity Attack** : Matching QIDs may not give an exact answer but can still give a general answer for SAs
+
+### T-Closeness
+
+#### Principle
+
+The *distance* between Overall distribution Q of sensitive values and Distribution Pi of sensitive values in each equi-class is bounded by a threshold t. *l-diversity only considered Pi*.
+
+t-closeness protects against attribute disclosure but not identity disclosure.
+
+t-closeness requires that the distribution of a sensitive attribute in any equivalence class is close to the distribution of a sensitive attribute in the overall table.
+
+### Types Of Information Disclosure
+
+- Identity Disclosure
+  - An individual is linked to a particular record in the published data.
+- Attribute Disclosure
+  - Sensitive attribute information of an individual is disclosed.
+- Membership Disclosure
+  - Information about whether an individual's record is in the published data or not.
 
 ### GPS location Anonymization
+
 - Anonymization done through *cloaked* regions with at least *k* users.
-    - here, *k* depends on context
-    - *k* = 100 is very little in a stadium, or a lot in a desert
+  - here, *k* depends on context
+  - *k* = 100 is very little in a stadium, or a lot in a desert
 
 ### Social Network (Graph)
+
 - Social **Net**Works; this data can be represented as a graph
 - very difficult to mark what is a QI
+
 #### privacy leak with graphs
+
 - Regardless of identity on a node, the # of connections cab let us know who is what node
+
 #### implement privacy
+
 - graphs can be k-degree anonymous where every node has the same degree as k-1 nodes
 - *fake* relations are created to match degrees between nodes, utility is lost.
 
 ### Search queries
+
 - Queries can be linked through sensitive values
 - Search engines are based on this sensitive data, to give better results
     Modern search engines don't depend on keywords, they focus on what the users do, the links clicked is linked to the query searched.
-#### implement privacy
+
+#### Implement privacy
+
 - cluster up queries that point to the same links
   - queries that users made are clustered if they clicked on the same link
 
 ### Whats on the Test?
+
 - Attacks
   - Linkage
   - Homogeneity
@@ -32,34 +202,38 @@
 
 - k-Anon, l-Div, t-Closeness
 
-## Chapt 3.
+## Chapt 3
 
 **Background knowledge!**
 Anon methods so far do not protect against BG very well
 
-TDC produce anon datasets, like HW1
+TDC (Trusted Data Curator) produce anon datasets, like HW1
 
 ### Differential Privacy
+
 Promise for protection against arbitrary background knowledge
 
-Protection relies on the fact that it is not certain if a particular user is part of the dataset
-
-Causes a paradox
-    learn nothing about the individual but learn about the population
-
-Statistical outcome should be indistinguishable if a particular user is included or not
-    Where there are spike, correlations
+- Protection relies on the fact that it is not certain if a particular user is part of the dataset
+  - Statistical outcome is indistinguishable regardless whether a particular user (record) is included in the data or not.
+- Causes a paradox
+  - learn nothing about the individual but learn about the population
+- Statistical outcome should be indistinguishable if a particular user is included or not
+  - Where there are spike, correlations
 
 Cannot determine if a user is in a dataset or not -> plausible deniability
 
 ### Probability Div Priv
-Two *users* that differ in one record / attribute should have a very similar probability in being an output
-    an output being a specific user
-    similar *user* entries should not have distinct outputs.
+
+- Two *users* that differ in one record / attribute should have a very similar probability in being an output
+  - An output being a specific user
+  - similar *user* entries should not have distinct outputs.
+
+$\log(\frac{Pr[A(D_1)=O]}{Pr[A(D_2)=O]}) <= \epsilon\ (\epsilon>0)$
 
 Noise is added to meet criteria? difficult to distinguish
 
 ### Parameter eps
+
 control the degree at which two similar entries could be distinguished between eachother
 
 D_2 neighboor of D_1
@@ -71,10 +245,12 @@ This is predefined
 esp is privacy budget
 
 ### Indistinguishably
+
 for every possible neighbor
 p(D_1) / p(D_2) <= e^eps
 
 ### Adding noise
+
 - Laplace Mechanism - Distribution
   - Noise determined on esp
   - Lap(S/esp)
@@ -99,18 +275,23 @@ p(D_1) / p(D_2) <= e^eps
   - More noise is added if a function is sensitive
 
 ### Indistiguishability
+
 Query to a database will return with noise
+
 - We don't know whether a particular use is actually in a database
 
 ### Composition Theorems
+
 *Compose* all these building blocks together
 
 Parallel composition has better utility, each query has it's own esp to satisfy
+
 - Can be used with disjoint queries
 Sequential composition requires that all queries satisfy esp
 - Easier to implement, used when there is overlap
 
 Postprocessing should not lead to any data leaks
+
 - not considered a composition method, does not consume privacy budget
 
 ### Differential private k-means
@@ -133,6 +314,7 @@ no pair of similar people can be differentiated from another.
 DP on a local scale; Centralized DP
 
 Reduce trust from the database, produce private data locally
+
 - pre-randomize data? Don't trust the DB
 - Each user runs a local DP algorithm
   - Once sent to the DB, it can just be combined
@@ -151,6 +333,7 @@ Error typically scales `sqrt(N)`, the more the better
 ### DP vs LDP
 
 LDP works on inputs no datasets
+
 - Ensures that no two similar inputs can be differentiated between
   - e.g. If we get yes or no from a person, we don't know if they specifically said y/n
 
@@ -159,9 +342,11 @@ LDP concerns two values, DP concerns two Data sets
 Noise in DP is constant while LDP's aggregate noise is `1/sqrt(n)`
 
 ### Google's RAPPOR
+
 - Random Response (RR) for something like favorite URL?
 
 #### Bloom filters can be used for indexing items
+
 - Items are represented as masks of this filter
   - 01001 => Apple
   - Filter 1001101001 has Apple
@@ -171,24 +356,30 @@ Noise in DP is constant while LDP's aggregate noise is `1/sqrt(n)`
 - This data structure is probabilistic, it is not 100% accurate
 
 ### Apple Sketches
+
 - Used for capturing frequencies
   - We don't care about who exactly, just identify groups
 
 ### Microsoft Telemetry
+
 - Collect app usage
   - Find behavior patterns
 
 #### 1BitMean
+
 #### dBitFlip
 
 ### Snap LDP ML
+
 - Send user a randomly chosen model depending on a rand model
 
 ### Frequency estimation
+
 - eps-LDP items should be equally probably to be output
 - We then remove bias from a RR using estimation
 
 ### Generalized RR - Direct encoding
+
 - Random *coin flip* is biased with param `p`
 - Other values are reported with probability `q`
 - values `p` and `q` are inversely proportional to `d`
@@ -196,26 +387,31 @@ Noise in DP is constant while LDP's aggregate noise is `1/sqrt(n)`
   - solved through unary encodings
 
 ### Unary Encoding
+
 - each user randomizes the true output for each value
 - observed value is then *filtered* to get a more accurate result
 - accuracy increases with more users
 - Better than DE
 
 ### Laplacian (gaussian)
+
 - Instead of randomizing each bit, add noise to each bit
 - Worse utility than UE
 
 ### Heavy Hitter prob
+
 - Find one most frequent values
   - Partition users into groups
   - concatenate most common segments
   - too large concatenates
 
 ### Node LDP
+
 - Social graphs are more diffictuly to deal with
 - isolated node groups should not be individually identifiable
 
 ## Chapt 5 Cryptography
+
 - Data Obfuscation
   - k-anon
   - l-div
@@ -230,8 +426,7 @@ Crypto: Encryption (protect message) and Authentication (protect users id)
 
 ### Types of basic crypto techs
 
-**Fundamental rule: Cipher should still be secure even if everyone knows the complete design**
-
+- **Fundamental rule: Cipher should still be secure even if everyone knows the complete design**
 - Cipher
   - Encrypt
     - Shift data
@@ -253,6 +448,7 @@ Crypto: Encryption (protect message) and Authentication (protect users id)
 ### Cryptographic attacks
 
 Attacker ...
+
 - Has only ciphertext
 - has plain and cipher text
   - Can find decoding pattern
@@ -274,22 +470,26 @@ Breaking One-Time Pad
 > `zmq` = random without key
 
 ### Indistinguishablity - *like DP for messages*
+
 Encryptor flips rand bit `r` to encrypt `M_i` to get `C`
 
 attacker gets `C` and has to guess `r`
 
 ### Practical Issues
+
 - One Time pad can get huge; large messages make large keys
 - It cannot be reused
 
 How to make the keys smaller?
+
 - 40 bits is pathetic
-- 128 is difficult 
+- 128 is difficult
 - 4096 mucho bueno
 
 ### Crypto Algorithms
 
 #### Block Ciphers
+
 - given msg and key we get cipher
 - Invertibility - everything has to be reversible
   - Given a cipher and key get msg
@@ -301,35 +501,42 @@ How to make the keys smaller?
   - Patterns can still be observed from encrypted values
 
 Rand component - probabilistic encryption
+
 - and randomness to the encryption
   - decrypted msg can still be obtained
 - How to add?
   - one time pad trick?
 
 #### Hashes & MAC
+
 crypto hash func -> for data sec. and priv.
 > msg `m` -> Hash `h` -> k-bit hash `h(m)`
 
 hash func `H` - maps n bits to k bits where k is security param
+
 - `H` should look like a random function
 - Should be hard to find collisions
 
 Collision intractibility
+
 - Should be very difficult to find collisions
 
 #### Public key crypto and Diffie-hellman key exchange
 
 Public key Crypto
+
 - private key only known by individual
 - public key known to anyone
 
 Idea
+
 - Confidentiality
   - encipher with public decipher with private
 - Auth
   - encipher with priv key, decipher with pub
 
 Requirements
+
 - Easy to de/cipher
 - infeasible to get priv from pub
 - infeasible to get priv from chosen plaintext attack
@@ -344,9 +551,10 @@ e.g.
     com with alice, bob computes `kS = kA^kB % p`
 
 #### RSA
-Exponentiation cipher 
-Relies on the difficulty of determining the number of 
-numbers relatively prime to a large integer n 
+
+Exponentiation cipher
+Relies on the difficulty of determining the number of
+numbers relatively prime to a large integer n
 > `tot(n)` : number of ints less than n with no factors common with n
 
 e.g.
@@ -371,15 +579,18 @@ pub key: `(e,n)`
 priv key: `(d,n)`
 
 ### Security Services
+
 - Confidentiality
 - Authentication
 - Integrity
 - Non-Repudiation
 
 ## Mid-Term
-Chapt. 1 - 5 
-Focus on 2 - 4 
+
+Chapt. 1 - 5
+Focus on 2 - 4
 6 Questions - Sub Questions
+
 - Open Note - in person
   - NOT open internet
   - Slides work
@@ -391,10 +602,13 @@ Focus on 2 - 4
 - Some questions might be similar to the homework
 
 ### Chapt. 1
+
 - Understand how privacy concerns can happen
   - Why users can be de-anonymized
 - The trade off between utility v.s. privacy
+
 ### Chapt. 2
+
 - Everything regarding the HW
 - No source code, just short answer
 - QIDs
@@ -408,7 +622,9 @@ Focus on 2 - 4
 - Skip pgs 57-62
 - understand how t-closeness works, not how to implement
 - how to generalize k-anon to other applications
+
 ### Chapt. 3
+
 - When to use DP vs LDP
 - How DP works
   - Why care about neighbors
@@ -421,7 +637,9 @@ Focus on 2 - 4
   - How does that work?
 - k-means
 - give example of when to use eps-delta
+
 ### Chapt. 4
+
 - Why do we use LDP? Vs DP?
 - understand Industrial applications
 - understand bloom filter
@@ -429,7 +647,9 @@ Focus on 2 - 4
 - Understand Itemset mining
   - questions how to design
 - How to link fundamentals to higher applications
+
 ### Chapt. 5
+
 - Questions should be easy?
 - Understand what is secure and not secure
 - Understand how ciphers works
