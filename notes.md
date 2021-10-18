@@ -669,3 +669,56 @@ Focus on 2 - 4
 - Block cipher
   - high level understanding
 - Understanding examples might be enough
+
+## Chapt. 6 Secure Multiparty Computation
+
+- Focus on crypto techniques
+  - Ensures 100% accuracy
+
+How to Compare values without actually knowing/revealing the values?
+
+- Given two **private** inputs, we want to compute a function of their inputs while maintaining privacy, correctness, and verifiable
+  - Function can be as simple as a comparison or as complicated as a ML task
+
+SMC Defines how parties are to exchange messages
+
+### protocol vs algorithm
+
+SMC is a protocol
+
+- protocol
+  - Involves more parties
+  - interaction with each other
+  - LDP is a protocol
+- algorithm
+  - protocols can be generalized as an algorithm
+
+### How to get rid of a trusted third party?
+
+k inputs (one per party) generates k outputs
+
+We want this protocol to ultimately behave as if there were a trusted third party
+
+### Attackers - What if we are attacking each other?
+
+- If we all were honest, no need for smc
+- Semi-honest, honest but curious
+  - Follows protocol for the most part
+  - Is honest but do what they can to learn more than normal
+- Malicious
+  - Deviates from protocol, lies about inputs, does whatever
+
+Honest parties should get the correct result from computing f  
+Corrupt parties should only get the result of evaluating f
+
+In real world application, the real protocol can simulate the ideal world view.
+
+Instead of passing values to a third party, run values through a protocol function
+
+The real world and idea world views should be *indistinguishable*, the the exact same but *similar*
+
+### Oblivious transfer
+
+i.e. A passes two inputs, B inputs the index of one of A's inputs, A learns nothing but B learns chosen input
+
+B send two pubs, one with knows key. A encyrpts both and returns. B can only decrypt one
