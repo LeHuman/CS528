@@ -69,7 +69,7 @@ $Precision\ P= 1-\frac{
 
 #### Attacks with BG knowledge or non-diverse SAs
 
-|  #  |  Zip  |  Age   | Nationality |      Condition      |
+| #   | Zip   | Age    | Nationality | Condition           |
 | --- | ----- | ------ | :---------: | ------------------- |
 | 1   | 130** | < 30   |      *      | Heart Disease       |
 | 2   | 130** | < 30   |      *      | Heart Disease       |
@@ -86,13 +86,13 @@ $Precision\ P= 1-\frac{
 
 BG: Japanese have low incidence of heart disease
 
-| Name  |  Zip  | Age | Nationality |
+| Name  | Zip   | Age | Nationality |
 | ----- | ----- | --- | :---------: |
 | Umeko | 13068 | 21  |  Japanese   |
 
 **Umeko has Viral Infection!**
 
-| Name |  Zip  | Age | Nationality |
+| Name | Zip   | Age | Nationality |
 | ---- | ----- | --- | :---------: |
 | Bob  | 13053 | 31  |  American   |
 
@@ -722,3 +722,38 @@ The real world and idea world views should be *indistinguishable*, the the exact
 i.e. A passes two inputs, B inputs the index of one of A's inputs, A learns nothing but B learns chosen input
 
 B send two pubs, one with knows key. A encyrpts both and returns. B can only decrypt one
+
+Note: Malicious receivers can generate keys for both pubs that are sent, this deviates from the protocol
+
+#### Generalize
+
+For a 1 out of k OT  
+Choose k-1 pubs with no keys
+Choose 1 pub with a key
+
+### Yao's Protocol
+
+Convert function to boolean circuit
+
+Generate truth table
+
+Garbled circuit
+
+Encrypt truth table, where each gate's inputs and outputs are encrypted
+
+randomize rows and send to receiver
+
+Can convert overall truth table to circuit
+
+#### Against Active Adversaries
+
+What can they do?
+
+Sender: encrypt different circuit  
+Receiver: report different output
+
+### Open Source Tools
+
+First started with Fairpaly, written in Java. Only made for two parties
+
+May tools now that support multiple parties and some can deal with the malicious model
