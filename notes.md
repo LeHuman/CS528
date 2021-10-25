@@ -69,7 +69,7 @@ $Precision\ P= 1-\frac{
 
 #### Attacks with BG knowledge or non-diverse SAs
 
-| #   | Zip   | Age    | Nationality | Condition           |
+|  #  |  Zip  |  Age   | Nationality |      Condition      |
 | --- | ----- | ------ | :---------: | ------------------- |
 | 1   | 130** | < 30   |      *      | Heart Disease       |
 | 2   | 130** | < 30   |      *      | Heart Disease       |
@@ -86,13 +86,13 @@ $Precision\ P= 1-\frac{
 
 BG: Japanese have low incidence of heart disease
 
-| Name  | Zip   | Age | Nationality |
+| Name  |  Zip  | Age | Nationality |
 | ----- | ----- | --- | :---------: |
 | Umeko | 13068 | 21  |  Japanese   |
 
 **Umeko has Viral Infection!**
 
-| Name | Zip   | Age | Nationality |
+| Name |  Zip  | Age | Nationality |
 | ---- | ----- | --- | :---------: |
 | Bob  | 13053 | 31  |  American   |
 
@@ -757,3 +757,38 @@ Receiver: report different output
 First started with Fairpaly, written in Java. Only made for two parties
 
 May tools now that support multiple parties and some can deal with the malicious model
+
+## Chapt. 7 Holomorphic Encryption
+
+### RSA History
+
+Most popular asymmetric encryption
+
+$E(m)=m^e(mod\ n)$  
+$D(c)=c^d(mod\ n)$
+
+#### Multiplicative Homomorphism
+
+RSA is multiplicatively homomorphic, but not additively
+
+$E(m_1)\cdot{}E(m_2)=E(m_1\cdot{}m_2)$
+
+### Homomorphic encryption
+
+Homomorphic encryption is a form of encryption that allows computation on ciphertexts, generating an encrypted result which, when decrypted, matches the result of the operations as if they had been performed on the plaintext
+
+From $E[A]$, $E[B]$, can compute $E[f(A,B)]$
+
+Where $f$ is +, x, xor, ...
+
+A division operation is very difficult
+
+Running functions on encrypted values will result in a final encrypted value that does result in the actual answer.
+
+Allows analysis of data without actually looking at the data
+
+*What about multiplying different encryption algorithms?*
+
+### Applying HE
+
+In Fairplay, HE can be applied when passing arguments through gates. AND gate can multiply the encrypted value of A and B
