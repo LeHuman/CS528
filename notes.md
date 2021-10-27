@@ -789,6 +789,24 @@ Allows analysis of data without actually looking at the data
 
 *What about multiplying different encryption algorithms?*
 
-### Applying HE
+#### Applying HE
 
 In Fairplay, HE can be applied when passing arguments through gates. AND gate can multiply the encrypted value of A and B
+
+Initial implementations were partially homomorphic, not just any computation was possible.
+
+### Fully HE
+
+#### Computing on encrypted data
+
+implementing XOR and AND makes us turing complete, in the sense that we can perform any operation using these two operations.
+
+#### How secure
+
+With no noise, GCD can be used to find the private key
+
+It seems that, when given non zero noise, no attack has broken this
+
+#### Noise issue
+
+Too much renders operation useless or unusably noisy
