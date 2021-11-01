@@ -810,3 +810,32 @@ It seems that, when given non zero noise, no attack has broken this
 #### Noise issue
 
 Too much renders operation useless or unusably noisy
+
+## Chapt. 8 Privacy Preserving Data Mining (Crypto)
+
+*How to privately mine data?*
+
+### Preword
+
+Algorithm should be efficient
+
+### Perturbation
+
+- DP
+- LDP
+- etc.
+
+### Cryptographic
+
+- Lindell & Pinkas
+- Completely accurate, completely secure
+
+### Solutions
+
+Secure multiparty computation
+proofs of security
+
+### Decision trees
+
+#### ID3 Horizontal partitioning
+
