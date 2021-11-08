@@ -69,7 +69,7 @@ $Precision\ P= 1-\frac{
 
 #### Attacks with BG knowledge or non-diverse SAs
 
-|  #  |  Zip  |  Age   | Nationality |      Condition      |
+| #   | Zip   | Age    | Nationality | Condition           |
 | --- | ----- | ------ | :---------: | ------------------- |
 | 1   | 130** | < 30   |      *      | Heart Disease       |
 | 2   | 130** | < 30   |      *      | Heart Disease       |
@@ -86,13 +86,13 @@ $Precision\ P= 1-\frac{
 
 BG: Japanese have low incidence of heart disease
 
-| Name  |  Zip  | Age | Nationality |
+| Name  | Zip   | Age | Nationality |
 | ----- | ----- | --- | :---------: |
 | Umeko | 13068 | 21  |  Japanese   |
 
 **Umeko has Viral Infection!**
 
-| Name |  Zip  | Age | Nationality |
+| Name | Zip   | Age | Nationality |
 | ---- | ----- | --- | :---------: |
 | Bob  | 13053 | 31  |  American   |
 
@@ -835,7 +835,39 @@ Algorithm should be efficient
 Secure multiparty computation
 proofs of security
 
-### Decision trees
+### Securely finding the closest cluster
 
-#### ID3 Horizontal partitioning
+adding r.v.s that add up to 0 to the encrypted values.
+
+### SMC final points
+
+It is still very slow and not practical, not good for large datasets.
+
+## Chapt. 9-A Zero-Knowledge proof (ZKP)
+
+Interactive proof - probabilistic, the verifier challenges the prover and only accepts after multiple challenges and responses
+
+Without sharing any knowledge, prove that you have the *key*
+
+Prover can reply with a part of knowledge that the verifier knows is protected / encrypted
+
+Verifier can also send an encrypted value to be decrypted and then receive the decrypted value from the prover.
+
+### Types of ZK Proofs
+
+#### proof of statement
+
+Convince verifier that statement is true without giving any other info
+
+#### proof of knowledge
+
+Convince verifier that prover has knowledge about something
+
+If both parties are honest, protocol succeeds with overwhelming probability.
+
+Anyone without the *key* should have a near zero chance of passing
+
+This proof should not leak any information
+
+### Fiat-Shamir protocol - quadratic residues
 
