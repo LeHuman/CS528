@@ -883,3 +883,86 @@ zero knowledge proof does not allow information to leak
 
 Every *round* can run in parallel
 
+### Schnorr's ID protocol
+
+Both simulated and real transcripts IO should be indistinguishable.
+
+When verifier is malicious Schnorr's ID protocol is not ZK
+
+### Crypto Commitment
+
+Commit - sender *locks* message in a box
+
+$(m)_{pk}\rarr{R_{receiver}}$
+
+Reveal - sender proves to receiver that the locked message is a certain one.
+
+$(m')\implies(m)$
+
+### Two kinds of adversaries
+
+Limited computation power and unlimited computation power
+
+### Other scheme
+
+Gen r1 r2 and M, send (r1, H(r1||M||r2))
+
+send M, r2; concatenated? not actually sending M?
+
+### Pedersen commitment scheme
+
+similar to Schnorr
+
+## Chapt. 9-B Private Information Retrieval (PIR)
+
+Make querying data private.
+
+Owner's of database know a lot about users ( i.e. Google )
+
+either trust the database or, use cryptography!
+
+### How can Crypto help?
+
+Can not help with *side channels* i.e. browser fingerprinting
+
+database is privacy malicious
+
+### PIR
+
+Goal - query while hiding data we are after
+
+Note - hides data-items, not the actual user
+
+Paradox with asking for something without letting anyone know what you are asking for.
+
+### Model
+
+Server holds very large n-bit string
+
+User wants $x_i$, while keeping $i$ private
+
+#### Not private
+
+Just sent $i$ to receive $x_i$ from server.
+
+#### Not practical
+
+Server sends entire database to user. Just not practical.
+
+Alt, additional queries for multiple random indices. leaks info and less efficient communication.
+
+garbled circuit, homomorphic encryption; too slow, inefficient.
+
+Anonymity - group queries together. Hides the individual user; person who requested $x_i$ but not the actual thing requested. Query itself could potentially identify user.
+
+#### Two approaches
+
+##### info-theo / k-server PIR
+
+Replicate server, where the user requests from multiple servers and computes the final answer from all servers.
+
+Weakness where servers must not interact with each other; collude, semi-honest model is used.
+
+##### computational PIR
+
+Only one server
