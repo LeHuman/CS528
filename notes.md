@@ -871,3 +871,15 @@ This proof should not leak any information
 
 ### Fiat-Shamir protocol - quadratic residues
 
+Proving a constant fits a quadratic residue $x^2 \cong q (mod n)$
+
+### Observations on the protocol
+
+multiple rounds where one commits, challenges, then responds
+
+prediction of the challenge enables cheating
+
+zero knowledge proof does not allow information to leak
+
+Every *round* can run in parallel
+
