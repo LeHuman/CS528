@@ -994,3 +994,12 @@ give each participant number between 0 and mod param `p-1`
 each of these shares can be combined to find the actual message value
 
 Like splitting up a map between people
+
+## Final
+
+How to implement HE
+
+Focus on protocols
+
+Focus on how overall system works, who makes the keys? when are things sent and how?
+
