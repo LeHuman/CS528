@@ -966,3 +966,31 @@ Weakness where servers must not interact with each other; collude, semi-honest m
 ##### computational PIR
 
 Only one server
+
+## Chapt. 9-C Secret Sharing Schemes
+
+Share a message M between n people where subset of >= size t can reconstruct M
+
+### Shamir Threshold Scheme
+
+$\text{(3,5) Scheme with modulus }p=17$
+
+$(1,8),(3,10),(5,11)$
+
+$s(x)\equiv{}M+s_1x+s_2x^2$
+
+$8=M+1s_1+1s_2$
+
+$10=M+3s_1+9s_2$
+
+$5=M+5s_1+25s_2$
+
+### Secret Value sharing
+
+(k,n) threshold secret sharing using threshold polynomial
+
+give each participant number between 0 and mod param `p-1`
+
+each of these shares can be combined to find the actual message value
+
+Like splitting up a map between people
