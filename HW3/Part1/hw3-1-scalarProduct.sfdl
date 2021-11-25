@@ -1,0 +1,36 @@
+/*
+ * Scalar product of two vectors
+ */
+program ScalarProduct {
+
+// Constants
+const inp_size = 10;
+
+// Type Definitions
+type Elem = Int<8>;
+
+type AliceInput = Elem[inp_size];
+type AliceOutput = Int<8>;
+
+type BobInput = Elem[inp_size];
+type BobOutput = Int<8>;
+
+type Input = struct {AliceInput alice, BobInput bob};
+type Output = struct {AliceOutput alice, BobOutput bob};
+
+// Function Definition
+function Output output(Input input) {
+    var Int<8> i;
+    var Int<8> accum;
+
+    accum = 0;
+
+    for (i = 0 to inp_size-1) {
+        accum = accum + (input.alice[i] & input.bob[i]);
+    }
+            
+    output.alice = accum;
+    output.bob = accum;
+}
+
+}
