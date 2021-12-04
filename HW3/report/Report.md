@@ -64,7 +64,8 @@ Final Expected Value: 3
 #### Bob Terminal
 
 ```sh
-./run_bob -c ../../scalarProduct.sfdl && ./run_bob -r ../../scalarProduct.sfdl "S&b~n2#m8_Q" 4
+./run_bob -c ../../scalarProduct.sfdl
+./run_bob -r ../../scalarProduct.sfdl "S&b~n2#m8_Q" 4
 ```
 
 #### Alice Terminal
@@ -94,6 +95,10 @@ The sender simply sends their public key to the receiver alongside their matrix 
 The receiver can then run calculations on this matrix, encoding their own values to be used in calculations where applicable.
 
 Finally the receiver sends back the final calculation to the sender.
+
+## Running
+
+The source for this part is a Jupyter Notebook. Run each cell in order.
 
 ## 512 bit key
 
@@ -433,13 +438,16 @@ Finally the receiver sends back the final calculation to the sender.
 3664650911340862523494173420041774810112447519701523646167739510929318712005635355442936565088791878006746463131303993869642543883755210225413124611467909
 7310790988791530603280315417615600697264312326437542124878396122445078764103876392636179936286601761988355332391196216332560801244423037641788176969165539]]
 ```
+
 \normalsize
+
+\newpage
 
 # Part 3 - SMC
 
-# Protocol Design
+## Protocol Design
 
-$Users = \{A, B, C, D\}$
+Users = $\{A, B, C, D\}$
 
 Each user has a private vector $\vec{V}_u$ and random integer $R_u$
 
