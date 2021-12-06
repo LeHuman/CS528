@@ -2,123 +2,81 @@
 
 import os
 
-import user, pickle
+import pickle
 import pandas as pd
-import numpy as np
 from pandas.core.frame import DataFrame
-from pathos.pools import ProcessPool as Pool
 from pathos.pools import ThreadPool as PyThreads
+
+import data_frames as FRAME
+from data_frames import FRAME_ID, FRAME_TIME
 from user import User
 
 PICKLE_PATH: str = "users.obj"
 
 
-def __create_users(df: DataFrame) -> list[User]:
+# def minMax(x):
+#     return pd.Series(index=["min", "max"], data=[x.min(), x.max()])
+
+
+def create_users(dataframes: dict[str, DataFrame]) -> list[User]:
+    user_map: dict[int, dict[str, DataFrame]] = dict()
+
+    for df_name, df in dataframes.items():
+        for id in df[FRAME_ID].unique():
+            df_usr = df[df[FRAME_ID] == id]
+
+            user_ent: dict[str, DataFrame]
+            if not (user_ent := user_map.get(id)):
+                user_map[id] = dict()
+                user_ent = user_map[id]
+
+            user_ent[df_name] = df_usr
+
     users: list[User] = []
 
-    for id in df["Id"].unique():
-        df_usr = df[df["Id"] == id]
-        usr = User(id)
-        usr.data = df_usr
-        users.append(usr)
+    for id, data in user_map.items():
+        users.append(User(id, data))
 
     return users
 
 
-def tick():
-    print("|", end="", flush=True)
-
-
-def parallel_apply(data, func, num_of_processes=12):
-    data_split = np.array_split(data, num_of_processes)
-    with Pool(num_of_processes) as p:
-        return pd.concat(p.map(lambda chunk: chunk.apply(func), data_split))
-
-
-def daily_frame() -> DataFrame:
-    daily_df = pd.read_csv("dataset/dailyActivity_merged.csv")
-
-    tick()
-    daily_df["ActivityDate"] = parallel_apply(daily_df["ActivityDate"], lambda x: user.convert_dataset_date(x, True))
-
-    tick()
-    return daily_df
-
-
-def heart_frame() -> DataFrame:
-    heart_df = pd.read_csv("dataset/heartrate_seconds_merged.csv")
-
-    tick()
-    heart_df = heart_df.rename(columns={"Time": "ActivityDate"})
-    heart_df["ActivityDate"] = parallel_apply(heart_df["ActivityDate"], lambda x: user.convert_dataset_date(x))
-
-    tick()
-    return heart_df
-
-
-def sleep_frame() -> DataFrame:
-    sleep_df = pd.read_csv("dataset/sleepDay_merged.csv")
-
-    tick()
-    sleep_df = sleep_df.rename(columns={"SleepDay": "ActivityDate"})
-    sleep_df["ActivityDate"] = parallel_apply(sleep_df["ActivityDate"], lambda x: user.convert_dataset_date(x))
-
-    tick()
-    return sleep_df
-
-
-def hourly_frame() -> DataFrame:
-    hourly_cal: DataFrame = pd.read_csv("dataset/hourlyCalories_merged.csv")
-    hourly_int: DataFrame = pd.read_csv("dataset/hourlyIntensities_merged.csv")
-    hourly_stp: DataFrame = pd.read_csv("dataset/hourlySteps_merged.csv")
-
-    tick()
-    hourly_df = hourly_cal.merge(hourly_int, "left", ("Id", "ActivityHour")).merge(hourly_stp, "left", ("Id", "ActivityHour"))
-    hourly_df = hourly_df.rename(columns={"ActivityHour": "ActivityDate"})
-
-    tick()
-
-    hourly_df["ActivityDate"] = parallel_apply(hourly_df["ActivityDate"], lambda x: user.convert_dataset_date(x))
-
-    tick()
-    return hourly_df
-
-
-def __gen_users() -> list[User]:
+def gen_users() -> list[User]:
     """Generates python object representation of dataset
 
     Returns:
         list[User]: List of users from the dataset
     """
-    frames: list[DataFrame] = [daily_frame, heart_frame, sleep_frame, hourly_frame]
+
+    names: list[str] = [
+        FRAME.DAILY,
+        FRAME.HEART,
+        FRAME.SLEEP,
+        FRAME.HOURLY,
+    ]
+    frames: list[DataFrame] = [FRAME.daily_frame, FRAME.heart_frame, FRAME.sleep_frame, FRAME.hourly_frame]
 
     # Concurrently interpret multiple CSVs
     with PyThreads(len(frames)) as pool:  # TODO: use actual multiprocessing
         frames = pool.map(lambda f: f(), frames)
         print()
 
-    daily_df = frames[0]
-    heart_df = frames[1]
-    sleep_df = frames[2]
-    hourly_df = frames[3]
+    # stat = ""
 
-    # Merge all datasets
-    daily_df = (
-        daily_df.merge(heart_df, "outer", ("Id", "ActivityDate"))
-        .merge(sleep_df, "outer", ("Id", "ActivityDate"))
-        .merge(hourly_df, "outer", ("Id", "ActivityDate"))
-    )
+    # for df_name, df in zip(names, frames):
+    #     stat += f"\n---< {df_name} >---\n{str(df.drop(FRAME_TIME, axis=1).drop(FRAME_ID, axis=1).apply(minMax))}"
+
+    # print(stat)
 
     # Create Users given dataset
-    users = __create_users(daily_df)
+    users = create_users(dict(zip(names, frames)))
 
-    with open(PICKLE_PATH, "w", encoding="utf-8") as file:
-        pickle.dump(users, file.buffer)
+    # with open(PICKLE_PATH, "w", encoding="utf-8") as file:
+    #     pickle.dump(users, file.buffer)
 
     return users
 
 
-def __get_pickled() -> list[User]:
+def get_pickled() -> list[User]:
     """Retrieves python object representation of dataset from local cache
 
     Returns:
@@ -136,10 +94,10 @@ def get_dataset() -> list[User]:
     """
     if os.path.exists(PICKLE_PATH):
         print("Using cached dataset")
-        return __get_pickled()
+        return get_pickled()
 
     print("Generating user base")
-    return __gen_users()
+    return gen_users()
 
 
 def main():
@@ -147,8 +105,8 @@ def main():
 
     users: list[User] = get_dataset()
 
-    for usr in users:
-        print(usr)
+    # for usr in users:
+    #     print(usr)
 
 
 if __name__ == "__main__":
