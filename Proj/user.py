@@ -1,10 +1,11 @@
-"""module containing user related things"""
+"""Module containing user related things"""
 
-import datetime, diffprivlib
-import time
-import pandas as pd
-from pandas.core.frame import DataFrame
 from numbers import Number
+
+import time
+import datetime
+import diffprivlib
+from pandas.core.frame import DataFrame
 
 
 def convert_dataset_date(date: str, short: bool = False) -> float:
@@ -47,11 +48,3 @@ class User:
             Number: The noisy value
         """
         return value.__class__(diffprivlib.mechanisms.Laplace(epsilon=eps, sensitivity=0.5).randomise(value))
-
-    # def add_data(self, df: DataFrame) -> None:
-    #     """Add user data to this User
-
-    #     Args:
-    #         df (DataFrame): The data frame containing the entries to add
-    #     """
-    #     self.data.append(df)
