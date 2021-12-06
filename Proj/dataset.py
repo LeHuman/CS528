@@ -39,7 +39,6 @@ def daily_frame() -> DataFrame:
     daily_df = pd.read_csv("dataset/dailyActivity_merged.csv")
 
     tick()
-    # daily_df["ActivityDate"] = daily_df["ActivityDate"].apply(lambda x: user.convert_dataset_date(x, True))
     daily_df["ActivityDate"] = parallel_apply(daily_df["ActivityDate"], lambda x: user.convert_dataset_date(x, True))
 
     tick()
@@ -51,7 +50,6 @@ def heart_frame() -> DataFrame:
 
     tick()
     heart_df = heart_df.rename(columns={"Time": "ActivityDate"})
-    # heart_df["ActivityDate"] = heart_df["ActivityDate"].apply(lambda x: user.convert_dataset_date(x))
     heart_df["ActivityDate"] = parallel_apply(heart_df["ActivityDate"], lambda x: user.convert_dataset_date(x))
 
     tick()
@@ -63,7 +61,6 @@ def sleep_frame() -> DataFrame:
 
     tick()
     sleep_df = sleep_df.rename(columns={"SleepDay": "ActivityDate"})
-    # sleep_df["ActivityDate"] = sleep_df["ActivityDate"].apply(lambda x: user.convert_dataset_date(x))
     sleep_df["ActivityDate"] = parallel_apply(sleep_df["ActivityDate"], lambda x: user.convert_dataset_date(x))
 
     tick()
@@ -81,7 +78,6 @@ def hourly_frame() -> DataFrame:
 
     tick()
 
-    # hourly_df["ActivityDate"] = hourly_df["ActivityDate"].apply(lambda x: user.convert_dataset_date(x))
     hourly_df["ActivityDate"] = parallel_apply(hourly_df["ActivityDate"], lambda x: user.convert_dataset_date(x))
 
     tick()
