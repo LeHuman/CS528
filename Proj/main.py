@@ -1,5 +1,6 @@
 """Main Module to run entire simulation"""
 
+from numbers import Number
 import os
 
 import math
@@ -15,20 +16,25 @@ from user import User
 
 def main():
     """Main Function"""
-    users: list[User] = dataset.get_dataset()
-    server = Server(users, epsilon=2)
+    users: list[User] = dataset.get_dataset()  # Get all users as objects
+    server = Server(users, epsilon=5)  # Initialize a server with privacy parameter epsilon of 3
 
-    for user in users:
-        print(user)
+    # Example calculation given a list of attributes, determined upon request
+    def test(pub: PubKey, acc: EncryptedNumber, usr: list[Number]) -> EncryptedNumber | bool:
+        calories = usr[0]
+        mod_active_dist = usr[1]
 
-    def test(acc: EncryptedNumber, usr: EncodedNumber) -> EncryptedNumber:
-        acc = acc + math.sqrt(usr.decode())
-        return acc
+        if mod_active_dist != 0:
+            acc = acc + EncodedNumber.encode(pub, calories * mod_active_dist)
+            return acc
 
-    print(server.requestFieldAvg(FRAME.HEART.BPM).value)
-    print(server.requestAction(FRAME.DAILY.MODERATELY_ACTIVE_DISTANCE, 0, test).value)
+        return False
 
-    users[5]
+    print(server.requestFieldAvg(FRAME.HEART.BPM).value)  # Print the overall average of heart BPM
+
+    # Run function test with the fields "daily calories" and "Daily moderately active distance"
+    request = server.requestAction([FRAME.DAILY.CALORIES, FRAME.DAILY.MODERATELY_ACTIVE_DISTANCE], 0, test)
+    print(request.value / request.counter)  # Print the average, counter is how many users actually ran the calculation
 
 
 if __name__ == "__main__":

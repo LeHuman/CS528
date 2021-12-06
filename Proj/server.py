@@ -18,36 +18,35 @@ KEY_SIZE = 1024
 class ServerRequest:
     counter: int  # Number of users that worked on this request
     epsilon: float  # privacy value
-    field: FIELD  # Field of this request
+    fields: list[FIELD]  # Field of this request
     value: EncryptedNumber  # The actual value being passed
     pub_key: PubKey  # PubKey used in this request
-    action: Callable[[EncryptedNumber, EncodedNumber], EncryptedNumber]  # The function to run on the values
+    action: Callable[[PubKey, EncryptedNumber, list[Number]], EncryptedNumber | bool]  # The function to run on the values
 
     def __init__(
         self,
-        field: FIELD,
+        fields: list[FIELD],
         value: Number,
         pub_key: PubKey,
         epsilon: float,
-        action: Callable[[EncryptedNumber, EncodedNumber], EncryptedNumber],
+        action: Callable[[PubKey, EncryptedNumber, list[Number]], EncryptedNumber | bool],
     ) -> None:
         self.counter = 0
         self.epsilon = epsilon
-        self.field = field
+        self.fields = fields
         self.value = pub_key.encrypt(value)
         self.pub_key = pub_key
         self.action = action
 
-    def run(self, number: EncodedNumber):
+    def run(self, numbers: list[Number]):
         if self.action != None:
-            self.value = self.action(self.value, number)
+            encNum = self.action(self.pub_key, self.value, numbers)
+            if encNum:
+                self.value = encNum
+                self.counter += 1
 
     def decrypt(self, priv_key: PrivKey) -> None:
-        self.value = self.field.TYPE(priv_key.decrypt(self.value))
-
-    def count(self, b: bool = True) -> None:
-        if b:
-            self.counter += 1
+        self.value = priv_key.decrypt(self.value)
 
     def setAvg(self, priv_key: PrivKey) -> None:
         self.decrypt(priv_key)
@@ -81,27 +80,30 @@ class Server:
         return self.pub_key
 
     def requestFieldAvg(self, field: FIELD) -> ServerRequest:
-        request = ServerRequest(field, 0, self.pub_key, self.epsilon, lambda a, u: a + u)
+        request = ServerRequest([field], 0, self.pub_key, self.epsilon, lambda p, a, u: a + EncodedNumber.encode(p, u[0]))
         for user in self.users:
-            request.count(user.request_action(field, request.epsilon, request.pub_key, request.run))
+            user.request_action(request.fields, request.epsilon, request.pub_key, request.run)
         request.setAvg(self.__priv_key)
         return request
 
-    def requestAction(
-        self, field: FIELD, init_value: Number, action: Callable[[EncryptedNumber, EncodedNumber], EncryptedNumber]
-    ) -> ServerRequest:
-        request = ServerRequest(field, init_value, self.pub_key, self.epsilon, action)
+    def requestAction(self, fields: list[FIELD], init_value: Number, action: Callable[[PubKey, EncryptedNumber, list[Number]], EncryptedNumber | bool]) -> ServerRequest:
+        request = ServerRequest(fields, init_value, self.pub_key, self.epsilon, action)
         for user in self.users:
-            if user.request_action(field, request.epsilon, request.pub_key, request.run):
-                request.counter += 1
+            user.request_action(request.fields, request.epsilon, request.pub_key, request.run)
         request.decrypt(self.__priv_key)
         return request
 
-    # def requestComparison(self):
-        
+    # def _requestAction(
+    #     self, fields: list[FIELD], init_value: Number, action: Callable[[Number, list[Number]], Number | bool]
+    # ) -> ServerRequest:
+    #     request = ServerRequest(fields, init_value, self.pub_key, self.epsilon, action)
+    #     for user in self.users:
+    #         user.request_action(request.fields, request.epsilon, request.pub_key, request.run)
+    #     request.decrypt(self.__priv_key)
+    #     return request
 
-    def collectRequest(self, request: ServerRequest) -> None:
-        field = request.field
-        cat = self.__userAgg.data[field.ENTRY]
-        cat[field] = request.value
-        print(self.__userAgg)
+    # def collectRequest(self, request: ServerRequest) -> None:
+    #     field = request.fields
+    #     cat = self.__userAgg.data[field.ENTRY]
+    #     cat[field] = request.value
+    #     print(self.__userAgg)

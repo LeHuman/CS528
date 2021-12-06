@@ -15,30 +15,26 @@ from pandas.core.frame import DataFrame
 
 class UserRequest:
     id_num: int  # ID of the user giving data
-    field: FIELD  # Field of this request
-    time: float  # UNIX Timestamp
-    value: Number  # The actual value being passed
+    fields: list[FIELD]  # Field of this request
+    values: list[Number]  # The actual value being passed
     pub_key: PubKey = None
 
-    def __init__(self, eps: float, id_num: int, field: FIELD, value: Number, time: float = -1, sensitivity=1) -> None:
+    def __init__(self, eps: float, id_num: int, fields: list[FIELD], values: list[Number], sensitivity=1) -> None:
         self.id_num = id_num
-        self.field = field
-        self.time = self.export_value(time, eps, sensitivity * 2) if time > 0 else None
-        self.value = self.export_value(value, eps, sensitivity)
+        self.fields = fields
+        self.values = [self.export_value(field, value, eps / len(fields), sensitivity) for field, value in zip(fields, values)]
 
     def __str__(self) -> str:
-        return f"ID:{self.id_num} FIELD:{self.field} TIME:{self.time} VALUE:{self.value}"
+        return f"ID:{self.id_num} FIELDS:{self.fields} VALUES:{self.values}"
 
     def encode(self, key: PubKey):
         if self.pub_key == None:
             self.pub_key = key
-            self.value = EncodedNumber.encode(key, self.value)
-            if isinstance(self.time, Number):
-                self.time = EncodedNumber.encode(key, self.time)
+            self.values = [EncodedNumber.encode(key, value) for value in self.values]
         else:
             raise Exception("UserRequest already encoded")
 
-    def export_value(self, value: Number, eps: float, sensitivity) -> Number:
+    def export_value(self, field: FIELD, value: Number, eps: float, sensitivity) -> Number:
         """Return value with added laplace noise
 
         Args:
@@ -49,7 +45,9 @@ class UserRequest:
         Returns:
             Number: The noisy value
         """
-        return self.field.TYPE(diffprivlib.mechanisms.Laplace(epsilon=eps, sensitivity=sensitivity).randomise(value))
+        if value == 0:
+            return 0
+        return field.TYPE(max(0, diffprivlib.mechanisms.Laplace(epsilon=eps, sensitivity=sensitivity).randomise(value)))
 
 
 class User:
@@ -92,11 +90,11 @@ class User:
     def __get_field_avg(self, field: FIELD) -> Number:
         return self.__get_field(field, False).mean()
 
-    def request_action(self, field: FIELD, eps: float, pub: PubKey, action: Callable[[EncodedNumber], None]) -> bool:
+    def request_action(self, fields: list[FIELD], eps: float, pub: PubKey, action: Callable[[list[Number]], None]) -> bool:
         try:
-            ur = UserRequest(eps, self.id_num, field, self.__get_field_avg(field))
-            ur.encode(pub)
-            action(ur.value)
+            ur = UserRequest(eps, self.id_num, fields, [self.__get_field_avg(field) for field in fields])
+            # ur.encode(pub)
+            action(ur.values)
             return True
         except KeyError:  # Not all users have the same fields
             return False
