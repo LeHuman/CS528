@@ -6,7 +6,7 @@ import numpy as np
 from pandas.core.frame import DataFrame
 from pathos.pools import ProcessPool as Pool
 
-# Data Frame Indexes
+# Data Frame Indexes - Used for easier indexing of values
 FRAME_ID = "Id"
 FRAME_TIME = "Time"
 
@@ -28,6 +28,8 @@ def NEW_FIELD(entry: str, val: str, TYPE: type) -> FIELD:
 
 
 class DAILY(ENTRY):
+    VALUE = "daily"
+
     CALORIES = NEW_FIELD("daily", "Calories", int)
     TOTAL_STEPS = NEW_FIELD("daily", "TotalSteps", int)
     TOTAL_DISTANCE = NEW_FIELD("daily", "TotalDistance", float)
@@ -44,27 +46,26 @@ class DAILY(ENTRY):
 
 
 class HEART(ENTRY):
+    VALUE = "heart"
+
     BPM = NEW_FIELD("heart", "Value", int)
 
 
 class SLEEP(ENTRY):
+    VALUE = "sleep"
+
     TOTAL_SLEEP_RECORDS = NEW_FIELD("sleep", "TotalSleepRecords", int)
     TOTAL_MINUTES_ASLEEP = NEW_FIELD("sleep", "TotalMinutesAsleep", int)
     TOTAL_TIME_IN_BED = NEW_FIELD("sleep", "TotalTimeInBed", int)
 
 
 class HOURLY(ENTRY):
+    VALUE = "hourly"
+
     CALORIES = NEW_FIELD("hourly", "Calories", int)
     TOTAL_INTENSITY = NEW_FIELD("hourly", "TotalIntensity", int)
     AVERAGE_INTENSITY = NEW_FIELD("hourly", "AverageIntensity", float)
     STEP_TOTAL = NEW_FIELD("hourly", "StepTotal", int)
-
-
-# Used for easier indexing of values
-DAILY = DAILY("daily")
-HEART = HEART("heart")
-SLEEP = SLEEP("sleep")
-HOURLY = HOURLY("hourly")
 
 
 def convert_dataset_date(date: str, short: bool = False) -> float:
@@ -106,7 +107,7 @@ def heart_frame() -> DataFrame:
 
     tick()
     heart_df = heart_df.rename(columns={"Time": FRAME_TIME})
-    heart_df[FRAME_TIME] = parallel_apply(heart_df[FRAME_TIME], lambda x: convert_dataset_date(x))
+    heart_df[FRAME_TIME] = parallel_apply(heart_df[FRAME_TIME], convert_dataset_date)
 
     tick()
     return heart_df
@@ -117,7 +118,7 @@ def sleep_frame() -> DataFrame:
 
     tick()
     sleep_df = sleep_df.rename(columns={"SleepDay": FRAME_TIME})
-    sleep_df[FRAME_TIME] = parallel_apply(sleep_df[FRAME_TIME], lambda x: convert_dataset_date(x))
+    sleep_df[FRAME_TIME] = parallel_apply(sleep_df[FRAME_TIME], convert_dataset_date)
 
     tick()
     return sleep_df
@@ -133,7 +134,7 @@ def hourly_frame() -> DataFrame:
     hourly_df = hourly_df.rename(columns={"ActivityHour": FRAME_TIME})
 
     tick()
-    hourly_df[FRAME_TIME] = parallel_apply(hourly_df[FRAME_TIME], lambda x: convert_dataset_date(x))
+    hourly_df[FRAME_TIME] = parallel_apply(hourly_df[FRAME_TIME], convert_dataset_date)
 
     tick()
     return hourly_df

@@ -12,8 +12,6 @@ from user import User
 import data_frames as FRAME
 from data_frames import FIELD
 
-KEY_SIZE = 1024
-
 
 class ServerRequest:
     counter: int  # Number of users that worked on this request
@@ -48,62 +46,43 @@ class ServerRequest:
     def decrypt(self, priv_key: PrivKey) -> None:
         self.value = priv_key.decrypt(self.value)
 
-    def setAvg(self, priv_key: PrivKey) -> None:
-        self.decrypt(priv_key)
-        self.value /= self.counter
+    def getAvg(self) -> Number:
+        return self.value / self.counter
 
 
 class Server:
     """Server Class for database sim"""
 
-    __userAgg: User
     pub_key: PubKey
     __priv_key: PrivKey
     epsilon: float
     users: list[User]
 
-    def __init__(self, users: list[User], epsilon: float = 3) -> None:
-        self.__userAgg = User(
-            -1,
-            {
-                FRAME.DAILY: DataFrame(),
-                FRAME.HEART: DataFrame(),
-                FRAME.SLEEP: DataFrame(),
-                FRAME.HOURLY: DataFrame(),
-            },
-        )
+    def __init__(self, users: list[User], epsilon: float = 3, key_size=1024) -> None:
         self.epsilon = epsilon
         self.users = users
-        self.pub_key, self.__priv_key = HE.generate_paillier_keypair(n_length=KEY_SIZE)
+        self.pub_key, self.__priv_key = HE.generate_paillier_keypair(n_length=key_size)
 
     def getPubKey(self) -> PubKey:
         return self.pub_key
 
-    def requestFieldAvg(self, field: FIELD) -> ServerRequest:
+    # Convenience function to get the average of a user base field
+    def requestFieldAvg(self, field: FIELD, testing: bool = False) -> ServerRequest:
         request = ServerRequest([field], 0, self.pub_key, self.epsilon, lambda p, a, u: a + EncodedNumber.encode(p, u[0]))
         for user in self.users:
-            user.request_action(request.fields, request.epsilon, request.pub_key, request.run)
-        request.setAvg(self.__priv_key)
-        return request
+            user.request_action(request.fields, request.epsilon, request.pub_key, request.run, testing)
+        request.decrypt(self.__priv_key)
+        return request.getAvg()
 
-    def requestAction(self, fields: list[FIELD], init_value: Number, action: Callable[[PubKey, EncryptedNumber, list[Number]], EncryptedNumber | bool]) -> ServerRequest:
+    def requestAction(
+        self,
+        fields: list[FIELD],
+        init_value: Number,
+        action: Callable[[PubKey, EncryptedNumber, list[Number]], EncryptedNumber | bool],
+        testing: bool = False,
+    ) -> ServerRequest:
         request = ServerRequest(fields, init_value, self.pub_key, self.epsilon, action)
         for user in self.users:
-            user.request_action(request.fields, request.epsilon, request.pub_key, request.run)
+            user.request_action(request.fields, request.epsilon, request.pub_key, request.run, testing)
         request.decrypt(self.__priv_key)
         return request
-
-    # def _requestAction(
-    #     self, fields: list[FIELD], init_value: Number, action: Callable[[Number, list[Number]], Number | bool]
-    # ) -> ServerRequest:
-    #     request = ServerRequest(fields, init_value, self.pub_key, self.epsilon, action)
-    #     for user in self.users:
-    #         user.request_action(request.fields, request.epsilon, request.pub_key, request.run)
-    #     request.decrypt(self.__priv_key)
-    #     return request
-
-    # def collectRequest(self, request: ServerRequest) -> None:
-    #     field = request.fields
-    #     cat = self.__userAgg.data[field.ENTRY]
-    #     cat[field] = request.value
-    #     print(self.__userAgg)

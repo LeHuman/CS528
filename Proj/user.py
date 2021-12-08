@@ -90,11 +90,15 @@ class User:
     def __get_field_avg(self, field: FIELD) -> Number:
         return self.__get_field(field, False).mean()
 
-    def request_action(self, fields: list[FIELD], eps: float, pub: PubKey, action: Callable[[list[Number]], None]) -> bool:
+    def request_action(
+        self, fields: list[FIELD], eps: float, pub: PubKey, action: Callable[[list[Number]], None], testing: bool = False
+    ) -> bool:
         try:
-            ur = UserRequest(eps, self.id_num, fields, [self.__get_field_avg(field) for field in fields])
-            # ur.encode(pub)
-            action(ur.values)
+            if testing:  # Only used for testing for report
+                action([self.__get_field_avg(field) for field in fields])
+            else:
+                ur = UserRequest(eps, self.id_num, fields, [self.__get_field_avg(field) for field in fields])
+                action(ur.values)
             return True
         except KeyError:  # Not all users have the same fields
             return False
