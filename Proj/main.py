@@ -3,8 +3,6 @@
 from numbers import Number
 import os
 
-import math
-import phe as HE
 from phe import EncryptedNumber, EncodedNumber
 from phe import PaillierPrivateKey as PrivKey
 from phe import PaillierPublicKey as PubKey
@@ -29,8 +27,6 @@ def main():
             return acc
 
         return False
-
-    print(server.requestFieldAvg(FRAME.HEART.BPM).value)  # Print the overall average of heart BPM
 
     # Run function test with the fields "daily calories" and "Daily moderately active distance"
     request = server.requestAction([FRAME.DAILY.CALORIES, FRAME.DAILY.MODERATELY_ACTIVE_DISTANCE], 0, test)
