@@ -222,6 +222,8 @@ Promise for protection against arbitrary background knowledge
 
 Cannot determine if a user is in a dataset or not -> plausible deniability
 
+incorporates
+
 ### Probability Div Priv
 
 - Two *users* that differ in one record / attribute should have a very similar probability in being an output
@@ -283,7 +285,7 @@ It is difficult to tell whether a user is in or not
 
 Query to a database will return with noise
 
-- We don't know whether a particular use is actually in a database
+- We don't know whether a particular user is actually in a database
 
 ### Composition Theorems
 
@@ -833,7 +835,26 @@ Algorithm should be efficient
 ### Solutions
 
 Secure multiparty computation
+
+crypto tools
+
 proofs of security
+
+### Toolkit
+
+Secure sum / Secure union
+
+#### Applications
+
+Decision tree training, horizontal part. data
+
+Association rule mining, horizontal part. data
+
+#### Secure sum
+
+Site I receives
+
+$V=R+\sum_{j=1}^{t-1}{v_jmodn}$
 
 ### Securely finding the closest cluster
 
